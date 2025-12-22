@@ -2,16 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY
 
-// List of models to try in order of preference
+// List of models to try in order of preference - Gemini 2.5 Flash prioritized
 const GEMINI_MODELS = [
-  'gemini-1.5-flash-002',
-  'gemini-1.5-flash-001', 
-  'gemini-1.5-flash',
-  'gemini-1.5-pro-002',
-  'gemini-1.5-pro-001',
-  'gemini-1.5-pro',
-  'gemini-2.0-flash-exp',
-  'gemini-pro'
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-latest',
+  'gemini-2.5-flash-002',
+  'gemini-2.5-flash-001',
+  'gemini-2.5-flash-exp',
 ]
 
 interface ChatMessage {

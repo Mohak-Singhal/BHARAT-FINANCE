@@ -1,18 +1,23 @@
 # 🔑 Gemini API Setup Instructions
 
-## ✅ **FIXED - Gemini 2.0 Flash & Multi-Model Support**
+## ✅ **UPDATED - Gemini 2.5 Flash Priority & Multi-Model Support**
 
-The AI Finance Coach now uses **multiple Gemini models** with automatic fallback for maximum reliability.
+The AI Finance Coach now prioritizes **Gemini 2.5 Flash** models with automatic fallback for maximum performance.
 
-## 🚀 **Current Models Supported**
-- **gemini-1.5-flash-002** (Primary)
-- **gemini-1.5-flash-001** 
-- **gemini-1.5-flash**
-- **gemini-1.5-pro-002**
-- **gemini-1.5-pro-001**
-- **gemini-1.5-pro**
-- **gemini-2.0-flash-exp** (Latest experimental)
-- **gemini-pro** (Fallback)
+## 🚀 **Current Models Supported (Priority Order)**
+- **gemini-2.5-flash** (Primary - Latest 2.5 Flash)
+- **gemini-2.5-flash-latest** (Latest 2.5 version)
+- **gemini-2.5-flash-002** (Stable 2.5)
+- **gemini-2.5-flash-001** (Stable 2.5)
+- **gemini-2.5-flash-exp** (Experimental 2.5)
+- **gemini-1.5-flash-002** (Fallback)
+- **gemini-1.5-flash-001** (Fallback)
+- **gemini-1.5-flash** (Fallback)
+- **gemini-1.5-pro-002** (Fallback)
+- **gemini-1.5-pro-001** (Fallback)
+- **gemini-1.5-pro** (Fallback)
+- **gemini-2.0-flash-exp** (Fallback)
+- **gemini-pro** (Legacy fallback)
 
 ## 📋 Setup Steps
 
@@ -42,8 +47,8 @@ npm run dev
 ## ✅ Verification
 
 1. **Go to**: http://localhost:3000/ai-coach
-2. **Send a message** - you should get AI responses from the best available model
-3. **Check for errors** - proper error handling for all scenarios
+2. **Send a message** - you should get AI responses from Gemini 2.5 Flash
+3. **Check response** - will show which model was used
 
 ## 🔧 API Status Check
 
@@ -56,7 +61,7 @@ Should return:
 {
   "gemini_configured": true,
   "setup_required": false,
-  "available_models": ["gemini-1.5-flash-002", "..."]
+  "available_models": ["gemini-2.5-flash", "..."]
 }
 ```
 
@@ -75,7 +80,7 @@ Should return:
 - **Solution**: Generate a new API key
 
 ### ✅ **"API Error: 404" (Model Not Found)**
-- **Cause**: ✅ **FIXED** - Now tries multiple models automatically
+- **Cause**: ✅ **FIXED** - Now tries multiple models automatically starting with 2.5 Flash
 
 ### ✅ **"Rate Limit Exceeded"**
 - **Cause**: Free tier quota exceeded
@@ -88,14 +93,15 @@ Should return:
 
 ## 🎯 Features (Once Configured)
 
-- **✅ Multi-model support** - Automatic fallback between models
+- **✅ Gemini 2.5 Flash Priority** - Uses the latest and fastest model first
+- **✅ Multi-model support** - Automatic fallback between 13 models
 - **✅ Real AI responses** powered by latest Gemini models
 - **✅ Indian finance expertise** (SIP, PPF, ELSS, tax planning)
 - **✅ Conversation context** maintained
 - **✅ No hardcoded responses** - all AI generated
 - **✅ Intelligent error handling** with detailed messages
 - **✅ Rate limit management** with user-friendly feedback
-- **✅ Fast responses** with the latest Gemini models
+- **✅ Fast responses** with the latest Gemini 2.5 Flash
 
 ## 🔒 Security Notes
 
@@ -105,15 +111,13 @@ Should return:
 
 ## 🚀 Model Selection Logic
 
-The API automatically tries models in this order:
-1. **gemini-1.5-flash-002** (Latest stable)
-2. **gemini-1.5-flash-001** (Stable)
-3. **gemini-1.5-flash** (Standard)
-4. **gemini-1.5-pro-002** (High quality)
-5. **gemini-1.5-pro-001** (High quality)
-6. **gemini-1.5-pro** (Standard pro)
-7. **gemini-2.0-flash-exp** (Experimental)
-8. **gemini-pro** (Legacy fallback)
+The API automatically tries models in this priority order:
+1. **gemini-2.5-flash** (Primary - Latest 2.5 Flash)
+2. **gemini-2.5-flash-latest** (Latest 2.5 version)
+3. **gemini-2.5-flash-002** (Stable 2.5)
+4. **gemini-2.5-flash-001** (Stable 2.5)
+5. **gemini-2.5-flash-exp** (Experimental 2.5)
+6. **Fallback to 1.5 models** if 2.5 not available
 
 ## 📊 Rate Limits (Free Tier)
 
@@ -124,6 +128,14 @@ The API automatically tries models in this order:
 
 **Upgrade to paid plan for higher limits!**
 
+## 🆕 Gemini 2.5 Flash Benefits
+
+- **Faster responses** than previous versions
+- **Better reasoning** capabilities
+- **Improved context understanding**
+- **Enhanced financial knowledge**
+- **More accurate calculations**
+
 ---
 
-**✅ The AI Finance Coach now works with the latest Gemini models and provides intelligent error handling!** 🚀
+**✅ The AI Finance Coach now prioritizes Gemini 2.5 Flash for the best performance and latest capabilities!** 🚀

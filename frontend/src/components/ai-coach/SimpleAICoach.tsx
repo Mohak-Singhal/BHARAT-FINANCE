@@ -36,7 +36,7 @@ const SimpleAICoach: React.FC = () => {
     const welcomeMessage: Message = {
       id: '1',
       type: 'assistant',
-      content: '👋 Hello! I\'m your AI Finance Coach powered by Google Gemini. I can help you with investment planning, budgeting, tax strategies, and more.\n\n🔑 **Note:** Make sure your Gemini API key is configured in the .env.local file for me to work properly.\n\nWhat financial question can I help you with today?',
+      content: '👋 Hello! I\'m your AI Finance Coach powered by Google Gemini 2.5 Flash. I can help you with investment planning, budgeting, tax strategies, and more.\n\n🚀 **Now using Gemini 2.5 Flash** - the latest and fastest AI model for the best financial advice!\n\nWhat financial question can I help you with today?',
       timestamp: new Date()
     }
     setMessages([welcomeMessage])
