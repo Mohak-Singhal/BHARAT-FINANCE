@@ -15,6 +15,7 @@ const SimpleAICoach: React.FC = () => {
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [detectedLanguage, setDetectedLanguage] = useState<string>('english')
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -36,7 +37,7 @@ const SimpleAICoach: React.FC = () => {
     const welcomeMessage: Message = {
       id: '1',
       type: 'assistant',
-      content: '👋 Hello! I\'m your AI Finance Coach powered by Google Gemini 2.5 Flash. I can help you with investment planning, budgeting, tax strategies, and more.\n\n🚀 **Now using Gemini 2.5 Flash** - the latest and fastest AI model for the best financial advice!\n\nWhat financial question can I help you with today?',
+      content: '👋 Hi there! I\'m your AI Finance Coach powered by Gemini 2.5 Flash.\n\nI can help you in multiple languages (English, Hindi, Marathi, Tamil, Telugu, Bengali) with practical advice about investments, budgeting, taxes, and more - all tailored for India! 🇮🇳\n\nWhat financial goal are you working on? (आप किस वित्तीय लक्ष्य पर काम कर रहे हैं?)',
       timestamp: new Date()
     }
     setMessages([welcomeMessage])
@@ -81,6 +82,16 @@ const SimpleAICoach: React.FC = () => {
           type: 'assistant',
           content: data.response,
           timestamp: new Date()
+        }
+
+        // Update detected language if provided
+        if (data.detected_language) {
+          setDetectedLanguage(data.detected_language)
+        }
+
+        // Show warning if response was incomplete
+        if (data.is_complete === false) {
+          console.warn('Response may be incomplete:', data.response)
         }
 
         setMessages(prev => [...prev, assistantMessage])
@@ -143,12 +154,17 @@ const SimpleAICoach: React.FC = () => {
   }
 
   const quickSuggestions = [
-    'Help me plan my investments',
-    'Create a monthly budget',
-    'Tax saving strategies',
-    'Emergency fund planning',
-    'SIP vs lump sum investment',
-    'Best mutual funds for beginners'
+    'I want to buy a house in 5 years',
+    'How do I start investing with ₹5000?',
+    'Best tax-saving options for me',
+    'Should I invest lump sum or SIP?',
+    'Help me create a budget',
+    'Emergency fund - how much do I need?',
+    // Multi-language suggestions
+    'मैं 5 साल में घर खरीदना चाहता हूं',
+    '₹5000 से निवेश कैसे शुरू करूं?',
+    'मेरे लिए सबसे अच्छे टैक्स सेविंग विकल्प',
+    'SIP बेहतर है या एकमुश्त निवेश?'
   ]
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -300,7 +316,7 @@ const SimpleAICoach: React.FC = () => {
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Type your financial question here..."
+                  placeholder="Type your financial question in any language... (किसी भी भाषा में अपना वित्तीय प्रश्न टाइप करें...)"
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:outline-none resize-none transition-colors"
                   rows={1}
                   style={{ minHeight: '48px', maxHeight: '120px' }}
@@ -326,16 +342,16 @@ const SimpleAICoach: React.FC = () => {
         {/* Features */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">Investment Planning</h3>
-            <p className="text-sm text-gray-600">Get personalized investment advice and portfolio recommendations</p>
+            <h3 className="font-semibold text-gray-800 mb-2">Multi-Language Support</h3>
+            <p className="text-sm text-gray-600">Ask questions in English, Hindi, Marathi, Tamil, Telugu, or Bengali</p>
           </div>
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">Budget Management</h3>
-            <p className="text-sm text-gray-600">Create and manage budgets tailored to your financial goals</p>
+            <h3 className="font-semibold text-gray-800 mb-2">Complete Responses</h3>
+            <p className="text-sm text-gray-600">Advanced AI ensures complete, well-formed answers every time</p>
           </div>
           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">Tax Optimization</h3>
-            <p className="text-sm text-gray-600">Learn about tax-saving strategies and investment options</p>
+            <h3 className="font-semibold text-gray-800 mb-2">Indian Finance Focus</h3>
+            <p className="text-sm text-gray-600">Specialized advice for SIP, PPF, ELSS, tax planning, and more</p>
           </div>
         </div>
       </div>
