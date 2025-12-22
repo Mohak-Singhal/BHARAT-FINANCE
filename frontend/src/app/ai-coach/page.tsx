@@ -1,7 +1,7 @@
 'use client'
 
-import ModernAICoach from '@/components/ai-coach/ModernAICoach'
+import SimpleAICoach from '@/components/ai-coach/SimpleAICoach'
 
 export default function AICoachPage() {
-  return <ModernAICoach />
+  return <SimpleAICoach />
 }

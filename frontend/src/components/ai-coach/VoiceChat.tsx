@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useTranslation } from 'react-i18next'
 import {
   Mic,
   MicOff,
@@ -11,11 +10,9 @@ import {
   User,
   Loader2,
   Settings,
-  Pause,
-  Play,
-  Square,
   Waves,
-  MessageSquare
+  RefreshCw,
+  Copy
 } from 'lucide-react'
 import { useVoice } from '@/hooks/useVoice'
 import { TTSConfig } from '@/services/voiceService'
@@ -41,34 +38,11 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
   language = 'en-IN',
   className = ''
 }) => {
-  // Safe i18n usage with fallback
-  let t, ready
-  try {
-    const translation = useTranslation()
-    t = translation.t
-    ready = translation.ready !== false // Default to true if ready is undefined
-  } catch (error) {
-    // Fallback function if i18n is not ready
-    t = (key: string, fallback?: string) => fallback || key
-    ready = true
-  }
-
-  // Don't render until i18n is ready
-  if (!ready) {
-    return (
-      <div className={`flex items-center justify-center h-full bg-white rounded-2xl shadow-xl ${className}`}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-3"></div>
-          <p className="text-gray-600">Loading voice chat...</p>
-        </div>
-      </div>
-    )
-  }
-
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [ttsConfig, setTtsConfig] = useState<Partial<TTSConfig>>({
     rate: 0.9,
     pitch: 1.0,
@@ -77,6 +51,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
   })
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   // Voice hook with configuration
@@ -90,30 +65,45 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
     },
     ttsConfig,
     onTranscript: (transcript, isFinal) => {
-      if (isFinal) {
+      if (isFinal && transcript.trim()) {
         setInputMessage(transcript)
-        // Auto-send if transcript is complete
-        if (transcript.trim()) {
-          handleSendMessage(transcript, true)
-        }
       }
     },
     onError: (error) => {
       console.error('Voice error:', error)
+      setError(`Voice error: ${error}`)
     }
   })
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom function - FIXED
+  const scrollToBottom = useCallback(() => {
+    if (messagesEndRef.current && messagesContainerRef.current) {
+      // Use scrollTop instead of scrollIntoView to prevent auto-scroll issues
+      const container = messagesContainerRef.current
+      container.scrollTop = container.scrollHeight
+    }
+  }, [])
+
+  // Auto-scroll when messages change - FIXED
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    // Only auto-scroll if user is near bottom (within 100px)
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current
+      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100
+      
+      if (isNearBottom) {
+        const timer = setTimeout(scrollToBottom, 100)
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [messages, scrollToBottom])
 
   // Welcome message
   useEffect(() => {
     const welcomeMessage: Message = {
       id: '1',
       type: 'assistant',
-      content: t('aiCoach.welcome', 'Hello! I\'m your AI Finance Coach. You can speak to me or type your questions. How can I help you today?'),
+      content: 'Hello! I\'m your AI Finance Coach. I can help you with investment planning, budgeting, tax strategies, and more. You can type your questions or use voice input. How can I assist you today?',
       timestamp: new Date()
     }
     setMessages([welcomeMessage])
@@ -124,7 +114,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
         voiceActions.speak(welcomeMessage.content, ttsConfig)
       }, 1000)
     }
-  }, [t, autoSpeak, voiceState.isSupported, voiceActions, ttsConfig])
+  }, []) // Remove dependencies to prevent re-initialization
 
   // Update TTS language when language changes
   useEffect(() => {
@@ -147,6 +137,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
     setMessages(prev => [...prev, userMessage])
     setInputMessage('')
     setIsLoading(true)
+    setError(null)
     voiceActions.clearTranscript()
 
     try {
@@ -155,8 +146,8 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
       if (onSendMessage) {
         response = await onSendMessage(messageToSend)
       } else {
-        // Default API call
-        const apiResponse = await fetch('/api/ai-coach', {
+        // Call our Next.js API route
+        const apiResponse = await fetch('/api/chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -174,7 +165,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
           const data = await apiResponse.json()
           response = data.response
         } else {
-          throw new Error('Failed to get response')
+          throw new Error(`API Error: ${apiResponse.status}`)
         }
       }
 
@@ -193,17 +184,19 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
       }
     } catch (error) {
       console.error('Error sending message:', error)
+      setError('Failed to get response. Please try again.')
+      
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: t('aiCoach.error', 'Sorry, I encountered an error. Please try again.'),
+        content: 'Sorry, I encountered an error. Please try again. I\'m here to help with your financial questions!',
         timestamp: new Date()
       }
       setMessages(prev => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
     }
-  }, [inputMessage, isLoading, messages, onSendMessage, autoSpeak, voiceState.isSupported, voiceActions, ttsConfig, t])
+  }, [inputMessage, isLoading, messages, onSendMessage, autoSpeak, voiceState.isSupported, voiceActions, ttsConfig])
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -232,10 +225,23 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
     setTtsConfig(prev => ({ ...prev, ...newConfig }))
   }
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+  }
+
+  const clearChat = () => {
+    setMessages([{
+      id: '1',
+      type: 'assistant',
+      content: 'Chat cleared! How can I help you with your financial questions?',
+      timestamp: new Date()
+    }])
+  }
+
   return (
     <div className={`flex flex-col h-full bg-white rounded-2xl shadow-xl overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary-500 to-secondary-600 p-4 text-white">
+      <div className="bg-gradient-to-r from-primary-500 to-secondary-600 p-4 text-white flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -270,6 +276,14 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
                 <VolumeX className="w-4 h-4" />
               </motion.button>
             )}
+
+            <button
+              onClick={clearChat}
+              className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+              title="Clear Chat"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
 
             <button
               onClick={() => setShowSettings(!showSettings)}
@@ -332,8 +346,15 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
         </AnimatePresence>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Messages Container - FIXED SCROLLING */}
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+        style={{ 
+          scrollBehavior: 'auto', // Changed from smooth to auto
+          overflowAnchor: 'none' // Prevent scroll anchoring
+        }}
+      >
         <AnimatePresence>
           {messages.map((message) => (
             <motion.div
@@ -360,23 +381,36 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm leading-relaxed break-words">{message.content}</p>
+                    <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+                      {message.content}
+                    </p>
                     <div className="flex items-center justify-between mt-2">
-                      <span className={`text-xs ${message.type === 'user' ? 'text-white/70' : 'text-gray-500'
-                        }`}>
+                      <span className={`text-xs ${message.type === 'user' ? 'text-white/70' : 'text-gray-500'}`}>
                         {message.timestamp.toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit'
                         })}
                       </span>
 
-                      {message.type === 'assistant' && voiceState.isSupported && (
-                        <button
-                          onClick={() => handleSpeakMessage(message.content)}
-                          className="p-1 hover:bg-gray-200 rounded transition-colors"
-                        >
-                          <Volume2 className="w-3 h-3 text-gray-500" />
-                        </button>
+                      {message.type === 'assistant' && (
+                        <div className="flex items-center space-x-1">
+                          {voiceState.isSupported && (
+                            <button
+                              onClick={() => handleSpeakMessage(message.content)}
+                              className="p-1 hover:bg-gray-200 rounded transition-colors"
+                              title="Read aloud"
+                            >
+                              <Volume2 className="w-3 h-3 text-gray-500" />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => copyToClipboard(message.content)}
+                            className="p-1 hover:bg-gray-200 rounded transition-colors"
+                            title="Copy message"
+                          >
+                            <Copy className="w-3 h-3 text-gray-500" />
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -400,6 +434,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
                   <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
                   <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
                 </div>
+                <span className="text-sm text-gray-600">Thinking...</span>
               </div>
             </div>
           </motion.div>
@@ -409,7 +444,24 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
       </div>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 flex-shrink-0">
+        {/* Error Display */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-3 p-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700"
+          >
+            {error}
+            <button
+              onClick={() => setError(null)}
+              className="ml-2 text-red-800 hover:text-red-900 underline"
+            >
+              Dismiss
+            </button>
+          </motion.div>
+        )}
+
         {/* Voice Status */}
         {voiceState.isListening && (
           <motion.div
@@ -451,8 +503,8 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={voiceState.isSupported ?
-                t('aiCoach.placeholderVoice', 'Type your message or click the mic to speak...') :
-                t('aiCoach.placeholder', 'Type your message...')
+                'Type your message or click the mic to speak...' :
+                'Type your message...'
               }
               className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-2xl focus:border-primary-500 focus:outline-none resize-none transition-colors"
               rows={1}
@@ -486,23 +538,6 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
             )}
           </button>
         </div>
-
-        {/* Error Display */}
-        {voiceState.error && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700"
-          >
-            {voiceState.error}
-            <button
-              onClick={voiceActions.clearError}
-              className="ml-2 text-red-800 hover:text-red-900 underline"
-            >
-              Dismiss
-            </button>
-          </motion.div>
-        )}
       </div>
     </div>
   )
