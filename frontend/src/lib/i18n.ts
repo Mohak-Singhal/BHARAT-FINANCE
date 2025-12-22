@@ -1,3 +1,5 @@
+'use client'
+
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
@@ -44,7 +46,10 @@ const resources = {
       // AI Coach
       'aiCoach.title': 'Your Personal AI Finance Coach',
       'aiCoach.subtitle': 'Get instant, personalized financial advice powered by advanced AI',
+      'aiCoach.welcome': 'Hello! I\'m your AI Finance Coach. You can speak to me or type your questions. How can I help you today?',
       'aiCoach.placeholder': 'Ask me anything about finance, investments, budgeting...',
+      'aiCoach.placeholderVoice': 'Type your message or click the mic to speak...',
+      'aiCoach.error': 'Sorry, I encountered an error. Please try again.',
       'aiCoach.send': 'Send',
       'aiCoach.listening': 'Listening...',
       'aiCoach.speaking': 'Speaking...',
@@ -135,7 +140,10 @@ const resources = {
       // AI Coach
       'aiCoach.title': 'आपका व्यक्तिगत AI वित्त कोच',
       'aiCoach.subtitle': 'उन्नत AI द्वारा संचालित तत्काल, व्यक्तिगत वित्तीय सलाह प्राप्त करें',
+      'aiCoach.welcome': 'नमस्ते! मैं आपका AI वित्त कोच हूं। आप मुझसे बात कर सकते हैं या अपने प्रश्न टाइप कर सकते हैं। आज मैं आपकी कैसे मदद कर सकता हूं?',
       'aiCoach.placeholder': 'वित्त, निवेश, बजट के बारे में कुछ भी पूछें...',
+      'aiCoach.placeholderVoice': 'अपना संदेश टाइप करें या बोलने के लिए माइक पर क्लिक करें...',
+      'aiCoach.error': 'क्षमा करें, मुझे एक त्रुटि का सामना करना पड़ा। कृपया पुनः प्रयास करें।',
       'aiCoach.send': 'भेजें',
       'aiCoach.listening': 'सुन रहा है...',
       'aiCoach.speaking': 'बोल रहा है...',
@@ -189,22 +197,38 @@ const resources = {
   // Add more languages as needed
 }
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources,
-    fallbackLng: 'en',
-    debug: false,
-    
-    interpolation: {
-      escapeValue: false,
-    },
-    
-    detection: {
-      order: ['localStorage', 'navigator', 'htmlTag'],
-      caches: ['localStorage'],
-    },
-  })
+// Initialize i18n only on client side
+if (typeof window !== 'undefined') {
+  i18n
+    .use(LanguageDetector)
+    .use(initReactI18next)
+    .init({
+      resources,
+      fallbackLng: 'en',
+      debug: false,
+      
+      interpolation: {
+        escapeValue: false,
+      },
+      
+      detection: {
+        order: ['localStorage', 'navigator', 'htmlTag'],
+        caches: ['localStorage'],
+      },
+    })
+} else {
+  // Server-side fallback
+  i18n
+    .use(initReactI18next)
+    .init({
+      resources,
+      fallbackLng: 'en',
+      debug: false,
+      
+      interpolation: {
+        escapeValue: false,
+      },
+    })
+}
 
 export default i18n

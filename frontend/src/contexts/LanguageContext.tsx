@@ -42,8 +42,19 @@ const translations: Record<string, Record<string, string>> = {
     'hero.subtitle': 'Democratizing financial knowledge for every Indian with AI-powered insights, real-time data, and personalized guidance',
     'hero.launchDashboard': 'Launch Dashboard',
     'hero.tryBudget': 'Try Budget Analyzer',
+    'hero.aiPowered': 'AI-Powered Financial Intelligence',
     'features.title': 'Everything You Need for Financial Success',
     'features.subtitle': 'From AI-powered investment advice to real-time policy analysis, we\'ve built the most comprehensive financial platform for India',
+    'aiCoach.title': 'Your Personal AI Finance Coach',
+    'aiCoach.subtitle': 'Get instant, personalized financial advice powered by advanced AI',
+    'aiCoach.welcome': 'Hello! I\'m your AI Finance Coach. You can speak to me or type your questions. How can I help you today?',
+    'aiCoach.placeholder': 'Ask me anything about finance, investments, budgeting...',
+    'aiCoach.placeholderVoice': 'Type your message or click the mic to speak...',
+    'aiCoach.error': 'Sorry, I encountered an error. Please try again.',
+    'aiCoach.suggestions.investment': 'Help me plan my investments',
+    'aiCoach.suggestions.budget': 'Create a monthly budget',
+    'aiCoach.suggestions.tax': 'Tax saving strategies',
+    'aiCoach.suggestions.emergency': 'Emergency fund planning',
   },
   hi: {
     'nav.home': 'होम',
@@ -60,8 +71,19 @@ const translations: Record<string, Record<string, string>> = {
     'hero.subtitle': 'AI-संचालित अंतर्दृष्टि, रीयल-टाइम डेटा और व्यक्तिगत मार्गदर्शन के साथ हर भारतीय के लिए वित्तीय ज्ञान का लोकतंत्रीकरण',
     'hero.launchDashboard': 'डैशबोर्ड लॉन्च करें',
     'hero.tryBudget': 'बजट विश्लेषक आज़माएं',
+    'hero.aiPowered': 'AI-संचालित वित्तीय बुद्धिमत्ता',
     'features.title': 'वित्तीय सफलता के लिए आपको जो कुछ भी चाहिए',
     'features.subtitle': 'AI-संचालित निवेश सलाह से लेकर रीयल-टाइम नीति विश्लेषण तक, हमने भारत के लिए सबसे व्यापक वित्तीय प्लेटफॉर्म बनाया है',
+    'aiCoach.title': 'आपका व्यक्तिगत AI वित्त कोच',
+    'aiCoach.subtitle': 'उन्नत AI द्वारा संचालित तत्काल, व्यक्तिगत वित्तीय सलाह प्राप्त करें',
+    'aiCoach.welcome': 'नमस्ते! मैं आपका AI वित्त कोच हूं। आप मुझसे बात कर सकते हैं या अपने प्रश्न टाइप कर सकते हैं। आज मैं आपकी कैसे मदद कर सकता हूं?',
+    'aiCoach.placeholder': 'वित्त, निवेश, बजट के बारे में कुछ भी पूछें...',
+    'aiCoach.placeholderVoice': 'अपना संदेश टाइप करें या बोलने के लिए माइक पर क्लिक करें...',
+    'aiCoach.error': 'क्षमा करें, मुझे एक त्रुटि का सामना करना पड़ा। कृपया पुनः प्रयास करें।',
+    'aiCoach.suggestions.investment': 'निवेश योजना में मदद करें',
+    'aiCoach.suggestions.budget': 'मासिक बजट बनाएं',
+    'aiCoach.suggestions.tax': 'कर बचत रणनीतियां',
+    'aiCoach.suggestions.emergency': 'आपातकालीन फंड योजना',
   },
   mr: {
     'nav.home': 'मुख्यपृष्ठ',
@@ -141,28 +163,37 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState('en')
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    // Load saved language from localStorage
-    const savedLanguage = localStorage.getItem('selectedLanguage')
-    if (savedLanguage && languages.find(lang => lang.code === savedLanguage)) {
-      setCurrentLanguage(savedLanguage)
-    }
+    setIsClient(true)
+    
+    // Load saved language from localStorage (only on client)
+    if (typeof window !== 'undefined') {
+      const savedLanguage = localStorage.getItem('selectedLanguage')
+      if (savedLanguage && languages.find(lang => lang.code === savedLanguage)) {
+        setCurrentLanguage(savedLanguage)
+      }
 
-    // Listen for language change events
-    const handleLanguageChange = (event: CustomEvent) => {
-      setCurrentLanguage(event.detail)
-    }
+      // Listen for language change events
+      const handleLanguageChange = (event: CustomEvent) => {
+        setCurrentLanguage(event.detail)
+      }
 
-    window.addEventListener('languageChange', handleLanguageChange as EventListener)
-    return () => window.removeEventListener('languageChange', handleLanguageChange as EventListener)
+      window.addEventListener('languageChange', handleLanguageChange as EventListener)
+      return () => window.removeEventListener('languageChange', handleLanguageChange as EventListener)
+    }
   }, [])
 
   const setLanguage = (code: string) => {
     setCurrentLanguage(code)
-    localStorage.setItem('selectedLanguage', code)
-    // Dispatch event for other components
-    window.dispatchEvent(new CustomEvent('languageChange', { detail: code }))
+    
+    // Only use localStorage and window on client side
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedLanguage', code)
+      // Dispatch event for other components
+      window.dispatchEvent(new CustomEvent('languageChange', { detail: code }))
+    }
   }
 
   const t = (key: string): string => {

@@ -17,8 +17,31 @@ import {
 import VoiceChat from './VoiceChat'
 
 const ModernAICoach: React.FC = () => {
-  const { t } = useTranslation()
+  // Safe i18n usage with fallback
+  let t, ready
+  try {
+    const translation = useTranslation()
+    t = translation.t
+    ready = translation.ready !== false // Default to true if ready is undefined
+  } catch (error) {
+    // Fallback function if i18n is not ready
+    t = (key: string, fallback?: string) => fallback || key
+    ready = true
+  }
+  
   const [selectedLanguage, setSelectedLanguage] = useState('en-IN')
+
+  // Don't render until i18n is ready
+  if (!ready) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading AI Coach...</p>
+        </div>
+      </div>
+    )
+  }
 
   // Handle message sending to backend
   const handleSendMessage = async (message: string): Promise<string> => {

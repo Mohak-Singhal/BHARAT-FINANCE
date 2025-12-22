@@ -54,7 +54,18 @@ export default function Header() {
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false)
   const [toolsMenuOpen, setToolsMenuOpen] = useState(false)
   const pathname = usePathname()
-  const { t, i18n } = useTranslation()
+  
+  // Safe i18n usage with fallback
+  let t, i18n
+  try {
+    const translation = useTranslation()
+    t = translation.t
+    i18n = translation.i18n
+  } catch (error) {
+    // Fallback function if i18n is not ready
+    t = (key: string) => key
+    i18n = { language: 'en', changeLanguage: () => {} }
+  }
 
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
   const toggleLanguageMenu = () => setLanguageMenuOpen(!languageMenuOpen)
@@ -106,7 +117,7 @@ export default function Header() {
                       className="flex items-center space-x-1 px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200"
                     >
                       <item.icon className="h-4 w-4" />
-                      <span>{item.name}</span>
+                      <span>{t(item.name)}</span>
                       <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${toolsMenuOpen ? 'rotate-180' : ''}`} />
                     </button>
 
@@ -127,7 +138,7 @@ export default function Header() {
                               className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                             >
                               <subItem.icon className="h-4 w-4 text-gray-400" />
-                              <span>{subItem.name}</span>
+                              <span>{t(subItem.name)}</span>
                             </Link>
                           ))}
                         </motion.div>
@@ -152,7 +163,7 @@ export default function Header() {
                   )}
                 >
                   <Icon className="h-4 w-4" />
-                  <span>{item.name}</span>
+                  <span>{t(item.name)}</span>
                 </Link>
               )
             })}
@@ -242,7 +253,7 @@ export default function Header() {
                       <div key={item.name}>
                         <div className="flex items-center space-x-3 px-3 py-3 text-base font-medium text-gray-600">
                           <item.icon className="h-5 w-5" />
-                          <span>{item.name}</span>
+                          <span>{t(item.name)}</span>
                         </div>
                         <div className="ml-8 space-y-1">
                           {item.submenu.map((subItem) => (
@@ -253,7 +264,7 @@ export default function Header() {
                               className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
                             >
                               <subItem.icon className="h-4 w-4" />
-                              <span>{subItem.name}</span>
+                              <span>{t(subItem.name)}</span>
                             </Link>
                           ))}
                         </div>
@@ -277,7 +288,7 @@ export default function Header() {
                       )}
                     >
                       <Icon className="h-5 w-5" />
-                      <span>{item.name}</span>
+                      <span>{t(item.name)}</span>
                     </Link>
                   )
                 })}

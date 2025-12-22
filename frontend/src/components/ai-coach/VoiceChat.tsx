@@ -41,7 +41,30 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
   language = 'en-IN',
   className = ''
 }) => {
-  const { t } = useTranslation()
+  // Safe i18n usage with fallback
+  let t, ready
+  try {
+    const translation = useTranslation()
+    t = translation.t
+    ready = translation.ready !== false // Default to true if ready is undefined
+  } catch (error) {
+    // Fallback function if i18n is not ready
+    t = (key: string, fallback?: string) => fallback || key
+    ready = true
+  }
+  
+  // Don't render until i18n is ready
+  if (!ready) {
+    return (
+      <div className={`flex items-center justify-center h-full bg-white rounded-2xl shadow-xl ${className}`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-3"></div>
+          <p className="text-gray-600">Loading voice chat...</p>
+        </div>
+      </div>
+    )
+  }
+  
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
