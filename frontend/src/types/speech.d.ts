@@ -5,6 +5,8 @@ interface SpeechRecognition extends EventTarget {
   interimResults: boolean
   lang: string
   maxAlternatives: number
+  serviceURI: string
+  grammars: SpeechGrammarList
   
   start(): void
   stop(): void
@@ -23,32 +25,45 @@ interface SpeechRecognition extends EventTarget {
   onstart: ((this: SpeechRecognition, ev: Event) => any) | null
 }
 
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string
-  message: string
+interface SpeechRecognitionEvent extends Event {
+  readonly resultIndex: number
+  readonly results: SpeechRecognitionResultList
 }
 
-interface SpeechRecognitionEvent extends Event {
-  resultIndex: number
-  results: SpeechRecognitionResultList
+interface SpeechRecognitionErrorEvent extends Event {
+  readonly error: string
+  readonly message: string
 }
 
 interface SpeechRecognitionResultList {
-  length: number
+  readonly length: number
   item(index: number): SpeechRecognitionResult
   [index: number]: SpeechRecognitionResult
 }
 
 interface SpeechRecognitionResult {
-  isFinal: boolean
-  length: number
+  readonly isFinal: boolean
+  readonly length: number
   item(index: number): SpeechRecognitionAlternative
   [index: number]: SpeechRecognitionAlternative
 }
 
 interface SpeechRecognitionAlternative {
-  transcript: string
-  confidence: number
+  readonly transcript: string
+  readonly confidence: number
+}
+
+interface SpeechGrammarList {
+  readonly length: number
+  item(index: number): SpeechGrammar
+  [index: number]: SpeechGrammar
+  addFromURI(src: string, weight?: number): void
+  addFromString(string: string, weight?: number): void
+}
+
+interface SpeechGrammar {
+  src: string
+  weight: number
 }
 
 declare var SpeechRecognition: {

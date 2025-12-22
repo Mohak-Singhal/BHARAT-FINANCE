@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY
+const GROQ_API_KEY = process.env.GROQ_API_KEY
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
-// List of models to try in order of preference - Gemini 2.5 Flash prioritized
-const GEMINI_MODELS = [
-  'gemini-2.5-flash',
-  'gemini-2.5-flash-latest',
-  'gemini-2.5-flash-002',
-  'gemini-2.5-flash-001',
-  'gemini-2.5-flash-exp',
-  'gemini-1.5-flash-002',
-  'gemini-1.5-flash-001',
-  'gemini-1.5-flash',
-  'gemini-1.5-pro-002',
-  'gemini-1.5-pro-001',
-  'gemini-1.5-pro'
+// Groq models to try in order of preference
+const GROQ_MODELS = [
+  'llama-3.1-70b-versatile',
+  'llama-3.1-8b-instant',
+  'llama3-70b-8192',
+  'llama3-8b-8192',
+  'mixtral-8x7b-32768'
 ]
 
 // Language detection patterns
@@ -30,63 +25,39 @@ const LANGUAGE_PATTERNS = {
 // Language-specific financial terms
 const FINANCIAL_TERMS = {
   hindi: {
-    sip: 'एसआईपी (व्यवस्थित निवेश योजना)',
-    ppf: 'पीपीएফ (सार्वजनिक भविष्य निधि)',
-    elss: 'ईएलएसएस (इक्विटी लिंक्ड सेविंग्स स्कीम)',
-    investment: 'निवेश',
-    savings: 'बचत',
-    budget: 'बजट',
-    tax: 'कर',
+    sip: 'SIP',
+    ppf: 'PPF',
+    elss: 'ELSS',
     rupees: '₹'
   },
   marathi: {
-    sip: 'एसआयपी (व्यवस्थित गुंतवणूक योजना)',
-    ppf: 'पीपीएफ (सार्वजनिक भविष्य निधी)',
-    elss: 'ईएलएसएस (इक्विटी लिंक्ड सेव्हिंग्स स्कीम)',
-    investment: 'गुंतवणूक',
-    savings: 'बचत',
-    budget: 'अर्थसंकल्प',
-    tax: 'कर',
+    sip: 'SIP',
+    ppf: 'PPF',
+    elss: 'ELSS',
     rupees: '₹'
   },
   tamil: {
-    sip: 'எஸ்ஐபி (முறையான முதலீட்டு திட்டம்)',
-    ppf: 'பிபிஎஃப் (பொது வருங்கால வைப்பு நிதி)',
-    elss: 'இஎல்எஸ்எஸ் (பங்கு இணைக்கப்பட்ட சேமிப்பு திட்டம்)',
-    investment: 'முதலீடு',
-    savings: 'சேமிப்பு',
-    budget: 'வரவு செலவு திட்டம்',
-    tax: 'வரி',
+    sip: 'SIP',
+    ppf: 'PPF',
+    elss: 'ELSS',
     rupees: '₹'
   },
   telugu: {
-    sip: 'ఎస్ఐపి (క్రమబద్ధమైన పెట్టుబడి పథకం)',
-    ppf: 'పిపిఎఫ్ (పబ్లిక్ ప్రావిడెంట్ ఫండ్)',
-    elss: 'ఇఎల్ఎస్ఎస్ (ఈక్విటీ లింక్డ్ సేవింగ్స్ స్కీమ్)',
-    investment: 'పెట్టుబడి',
-    savings: 'పొదుపు',
-    budget: 'బడ్జెట్',
-    tax: 'పన్ను',
+    sip: 'SIP',
+    ppf: 'PPF',
+    elss: 'ELSS',
     rupees: '₹'
   },
   bengali: {
-    sip: 'এসআইপি (সিস্টেমেটিক ইনভেস্টমেন্ট প্ল্যান)',
-    ppf: 'পিপিএফ (পাবলিক প্রভিডেন্ট ফান্ড)',
-    elss: 'ইএলএসএস (ইক্যুইটি লিংকড সেভিংস স্কিম)',
-    investment: 'বিনিয়োগ',
-    savings: 'সঞ্চয়',
-    budget: 'বাজেট',
-    tax: 'কর',
+    sip: 'SIP',
+    ppf: 'PPF',
+    elss: 'ELSS',
     rupees: '₹'
   },
   english: {
-    sip: 'SIP (Systematic Investment Plan)',
-    ppf: 'PPF (Public Provident Fund)',
-    elss: 'ELSS (Equity Linked Savings Scheme)',
-    investment: 'investment',
-    savings: 'savings',
-    budget: 'budget',
-    tax: 'tax',
+    sip: 'SIP',
+    ppf: 'PPF',
+    elss: 'ELSS',
     rupees: '₹'
   }
 }
@@ -102,149 +73,45 @@ interface ChatRequest {
   preferred_language?: string
 }
 
+// Helper to remove any lingering Markdown symbols that confuse TTS
+function cleanTextForTTS(text: string): string {
+  return text
+    .replace(/\*\*/g, '') // Remove bold asterisks
+    .replace(/\*/g, '')   // Remove single asterisks
+    .replace(/__/g, '')   // Remove underscores
+    .replace(/`/g, '')    // Remove code ticks
+    .replace(/^#+\s/gm, '') // Remove headers
+    .replace(/^\s*-\s/gm, '') // Remove bullet points
+    .replace(/\n\n/g, '. ') // Turn double line breaks into pauses
+    .trim()
+}
+
 // Detect user's language from message
 function detectLanguage(message: string): string {
-  // Check for explicit language patterns
   for (const [lang, pattern] of Object.entries(LANGUAGE_PATTERNS)) {
     if (pattern.test(message)) {
       return lang
     }
   }
-  
-  // Default to English if no pattern matches
   return 'english'
 }
 
-// Check if response is complete (ends with proper punctuation)
-function isResponseComplete(text: string): boolean {
-  const trimmed = text.trim()
-  if (trimmed.length === 0) return false
-  
-  // Check if ends with proper sentence endings
-  const endsWithPunctuation = /[.!?।॥।।]$/.test(trimmed)
-  
-  // Check if doesn't end mid-word or with incomplete phrases
-  const endsIncomplete = /\b(and|or|but|so|the|a|an|in|on|at|to|for|with|by|from|up|about|into|through|during|before|after|above|below|between|among|since|until|while|because|although|however|therefore|moreover|furthermore|additionally|consequently|meanwhile|nevertheless|nonetheless|otherwise|instead|rather|indeed|certainly|definitely|probably|perhaps|maybe|possibly|likely|unlikely|obviously|clearly|apparently|evidently|surprisingly|unfortunately|fortunately|interestingly|importantly|significantly|particularly|especially|specifically|generally|typically|usually|normally|commonly|frequently|rarely|seldom|never|always|often|sometimes|occasionally|regularly|constantly|continuously|permanently|temporarily|immediately|instantly|quickly|slowly|gradually|suddenly|eventually|finally|ultimately|initially|originally|previously|recently|currently|presently|nowadays|today|tomorrow|yesterday|earlier|later|soon|shortly|briefly|momentarily|shortly|recently|lately|ago|since|until|during|while|when|where|why|how|what|which|who|whom|whose|that|this|these|those|such|same|other|another|each|every|all|some|any|no|none|both|either|neither|few|many|much|more|most|less|least|several|various|different|similar|same|equal|equivalent|identical|comparable|relative|absolute|exact|approximate|rough|precise|accurate|correct|wrong|right|left|up|down|in|out|on|off|over|under|above|below|before|after|during|while|since|until|from|to|at|by|with|without|through|across|along|around|between|among|within|outside|inside|beyond|beneath|beside|near|far|close|distant|here|there|everywhere|nowhere|somewhere|anywhere|wherever|whenever|however|whatever|whichever|whoever|whomever|whose|why|how|where|when|what|which|who|whom|that|this|these|those|such|same|other|another|each|every|all|some|any|no|none|both|either|neither|few|many|much|more|most|less|least|several|various|different|similar|equal|equivalent|identical|comparable|relative|absolute|exact|approximate|rough|precise|accurate|correct|wrong|right|left)$/i.test(trimmed)
-  
-  return endsWithPunctuation && !endsIncomplete
-}
-
-// Attempt to complete truncated response
-async function completeResponse(originalResponse: string, originalPrompt: string, modelName: string): Promise<string> {
-  if (isResponseComplete(originalResponse)) {
-    return originalResponse
-  }
-  
-  const completionPrompt = `The following response was cut off mid-sentence. Please complete it naturally and ensure it ends with proper punctuation:
-
-Original response: "${originalResponse}"
-
-Complete the response by continuing from where it left off. Make sure to:
-1. Continue the thought naturally
-2. End with proper punctuation
-3. Keep the same tone and language
-4. Provide a complete, helpful answer
-
-Completed response:`
-
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`
-    
-    const response = await fetch(`${url}?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: completionPrompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 30,
-          topP: 0.8,
-          maxOutputTokens: 1024,
-        },
-        safetySettings: [
-          {
-            category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_ONLY_HIGH"
-          },
-          {
-            category: "HARM_CATEGORY_HATE_SPEECH",
-            threshold: "BLOCK_ONLY_HIGH"
-          },
-          {
-            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            threshold: "BLOCK_ONLY_HIGH"
-          },
-          {
-            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-            threshold: "BLOCK_ONLY_HIGH"
-          }
-        ]
-      }),
-    })
-
-    if (response.ok) {
-      const data = await response.json()
-      if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-        const completedResponse = data.candidates[0].content.parts[0].text.trim()
-        return completedResponse
-      }
-    }
-  } catch (error) {
-    console.error('Error completing response:', error)
-  }
-  
-  // If completion fails, return original with proper ending
-  return originalResponse.trim() + (originalResponse.trim().match(/[.!?।॥]$/) ? '' : '.')
-}
-
-async function callGeminiAPI(prompt: string, modelName: string, retryCount = 0): Promise<any> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`
-  
-  const response = await fetch(`${url}?key=${GEMINI_API_KEY}`, {
+async function callGroqAPI(messages: any[], modelName: string): Promise<any> {
+  const response = await fetch(GROQ_API_URL, {
     method: 'POST',
     headers: {
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      contents: [{
-        parts: [{
-          text: prompt
-        }]
-      }],
-      generationConfig: {
-        temperature: 0.8,
-        topK: 40,
-        topP: 0.9,
-        maxOutputTokens: 1500, // Increased significantly for complete responses
-        stopSequences: [], // Remove any stop sequences that might truncate
-      },
-      safetySettings: [
-        {
-          category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_ONLY_HIGH"
-        },
-        {
-          category: "HARM_CATEGORY_HATE_SPEECH",
-          threshold: "BLOCK_ONLY_HIGH"
-        },
-        {
-          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold: "BLOCK_ONLY_HIGH"
-        },
-        {
-          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-          threshold: "BLOCK_ONLY_HIGH"
-        }
-      ]
+      model: modelName,
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 1500,
+      top_p: 0.9,
+      stream: false
     }),
   })
-
   return response
 }
 
@@ -254,229 +121,122 @@ export async function POST(request: NextRequest) {
     const { message, conversation_history = [], preferred_language } = body
 
     if (!message || message.trim().length === 0) {
-      return NextResponse.json(
-        { error: 'Message is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 })
     }
 
-    // Check if Gemini API key is configured
-    if (!GEMINI_API_KEY || GEMINI_API_KEY.trim() === '') {
-      return NextResponse.json({
-        error: 'Gemini API key is not configured. Please add your GEMINI_API_KEY to the .env.local file.',
-        setup_required: true,
-        instructions: 'Get your free API key from https://makersuite.google.com/app/apikey'
-      }, { status: 503 })
+    if (!GROQ_API_KEY || GROQ_API_KEY.trim() === '') {
+      return NextResponse.json({ error: 'Groq API key not configured' }, { status: 503 })
     }
 
-    // Detect user's language
     const detectedLanguage = preferred_language || detectLanguage(message)
     const terms = FINANCIAL_TERMS[detectedLanguage as keyof typeof FINANCIAL_TERMS] || FINANCIAL_TERMS.english
 
-    // Create language-specific system prompt
+    // UPDATED PROMPTS: Specifically designed for VOICE/TTS
+    // Instructions explicitly forbid Markdown and lists
     const getSystemPrompt = (language: string) => {
       const basePrompts = {
-        hindi: `आप भारतीय उपयोगकर्ताओं के लिए एक मित्रवत AI वित्त सलाहकार हैं। व्यावहारिक वित्तीय सलाह प्रदान करें।
+        hindi: `आप एक मित्रवत वित्तीय सलाहकार हैं जो बोलकर बात कर रहे हैं।
+शैलियाँ:
+- बिल्कुल साधारण टेक्स्ट में लिखें।
+- कोई भी फॉर्मेटिंग, बोल्ड (**), बुलेट पॉइंट या लिस्ट का उपयोग न करें।
+- वाक्यों को छोटा और बोलने में आसान रखें।
+- लिस्ट के बजाय "पहला", "दूसरा", "अंत में" शब्दों का प्रयोग करें।
+- केवल ₹ (रुपये) का उपयोग करें।
+- उत्तर ऐसा होना चाहिए जिसे आसानी से पढ़ा और सुना जा सके।`,
 
-उत्तर शैली:
-- पूर्ण वाक्यों में उत्तर दें (कम से कम 3-4 वाक्य)
-- सरल, रोजमर्रा की भाषा का उपयोग करें
-- प्रोत्साहित करने वाले और सहायक बनें
-- व्यावहारिक सुझाव दें
-- भारतीय वित्तीय उत्पादों पर ध्यान दें (${terms.sip}, ${terms.ppf}, ${terms.elss})
-- ${terms.rupees} में उदाहरण दें
+        marathi: `तुम्ही एक मैत्रीपूर्ण आर्थिक सल्लागार आहात जे बोलत आहेत.
+शैली:
+- पूर्णपणे साध्या मजकुरात लिहा.
+- कोणतेही फॉरमॅटिंग, बोल्ड (**), बुलेट पॉइंट्स वापरू नका.
+- वाक्ये लहान आणि बोलण्यास सोपी ठेवा.
+- यादीऐवजी "पहिले", "दुसरे", "शेवटी" असे शब्द वापरा.
+- उत्तर असे असावे जे सहज वाचता आणि ऐकता येईल.`,
 
-महत्वपूर्ण: हमेशा पूर्ण, सहायक उत्तर प्रदान करें। वाक्य बीच में न छोड़ें।`,
+        tamil: `நீங்கள் ஒரு நட்பு நிதி ஆலோசகர்.
+பாணி:
+- எளிய உரையில் மட்டுமே எழுதவும்.
+- எந்தவொரு வடிவமைப்பு, தடிமனான எழுத்துக்கள் (**) அல்லது பட்டியல்களைப் பயன்படுத்த வேண்டாம்.
+- வாக்கியங்களைச் சிறியதாகவும் பேசுவதற்கு எளிதாகவும் வைக்கவும்.
+- பட்டியல்களுக்குப் பதிலாக "முதலில்", "இரண்டாவதாக" போன்ற சொற்களைப் பயன்படுத்தவும்.
+- பதில் குரல் வழி கேட்பதற்கு ஏற்றதாக இருக்க வேண்டும்.`,
 
-        marathi: `तुम्ही भारतीय वापरकर्त्यांसाठी एक मैत्रीपूर्ण AI वित्त सल्लागार आहात. व्यावहारिक आर्थिक सल्ला द्या.
+        telugu: `మీరు స్నేహపూర్వక ఆర్థిక సలహాదారు.
+శైలి:
+- సాధారణ వచనంలో మాత్రమే రాయండి.
+- ఎటువంటి ఫార్మాటింగ్, బోల్డ్ (**), లేదా జాబితాలను ఉపయోగించవద్దు.
+- వాక్యాలను చిన్నవిగా మరియు మాట్లాడటానికి సులభంగా ఉంచండి.
+- జాబితాలకు బదులుగా "మొదట", "రెండవది" వంటి పదాలను ఉపయోగించండి.
+- సమాధానం వాయిస్ ద్వారా వినడానికి అనుకూలంగా ఉండాలి.`,
 
-उत्तर शैली:
-- पूर्ण वाक्यांमध्ये उत्तर द्या (किमान 3-4 वाक्ये)
-- सोपी, दैनंदिन भाषा वापरा
-- प्रोत्साहनदायक आणि सहाय्यक व्हा
-- व्यावहारिक सूचना द्या
-- भारतीय आर्थिक उत्पादनांवर लक्ष केंद्रित करा (${terms.sip}, ${terms.ppf}, ${terms.elss})
-- ${terms.rupees} मध्ये उदाहरणे द्या
+        bengali: `আপনি একজন বন্ধুত্বপূর্ণ আর্থিক পরামর্শদাতা।
+শৈলী:
+- শুধুমাত্র সাধারণ পাঠ্য ব্যবহার করুন।
+- কোনো ফরম্যাটিং, বোল্ড (**) বা বুলেট পয়েন্ট ব্যবহার করবেন না।
+- বাক্যগুলি ছোট এবং বলার জন্য সহজ রাখুন।
+- তালিকার পরিবর্তে "প্রথমত", "দ্বিতীয়ত" শব্দগুলি ব্যবহার করুন।
+- উত্তরটি এমন হতে হবে যা সহজেই শোনা এবং বোঝা যায়।`,
 
-महत्वाचे: नेहमी पूर्ण, उपयुक्त उत्तरे द्या. वाक्य अर्ध्यात सोडू नका.`,
+        english: `You are a friendly AI Finance Coach speaking to the user via voice.
+RESPONSE RULES FOR TTS (TEXT-TO-SPEECH):
+1. **STRICTLY NO MARKDOWN**. Do not use bold (**), italics, headers, or bullet points.
+2. Do not use numbered lists (1. 2. 3.). Instead, use transitional words like "First," "Another option is," and "Finally."
+3. Keep sentences short and conversational.
+4. Use full names for acronyms when first mentioned, for example: "${terms.sip} or Systematic Investment Plan".
+5. Speak naturally as if you are on a phone call.
+6. Provide specific Indian context using ${terms.rupees}.
 
-        tamil: `நீங்கள் இந்திய பயனர்களுக்கான நட்பு AI நிதி ஆலோசகர். நடைமுறை நிதி ஆலோசனை வழங்கவும்.
-
-பதில் பாணி:
-- முழுமையான வாக்கியங்களில் பதிலளிக்கவும் (குறைந்தது 3-4 வாக்கியங்கள்)
-- எளிய, அன்றாட மொழியைப் பயன்படுத்தவும்
-- ஊக்கமளிக்கும் மற்றும் உதவிகரமாக இருங்கள்
-- நடைமுறை ஆலோசனைகளை வழங்கவும்
-- இந்திய நிதி தயாரிப்புகளில் கவனம் செலுத்துங்கள் (${terms.sip}, ${terms.ppf}, ${terms.elss})
-- ${terms.rupees} இல் உதாரணங்களை கொடுங்கள்
-
-முக்கியம்: எப்போதும் முழுமையான, உதவிகரமான பதில்களை வழங்கவும். வாக்கியங்களை நடுவில் விடாதீர்கள்.`,
-
-        telugu: `మీరు భారతీయ వినియోగదారుల కోసం స్నేహపూర్వక AI ఫైనాన్స్ సలహాదారు. ఆచరణాత్మక ఆర్థిక సలహా అందించండి.
-
-సమాధాన శైలి:
-- పూర్తి వాక్యాలలో సమాధానం ఇవ్వండి (కనీసం 3-4 వాక్యాలు)
-- సరళమైన, రోజువారీ భాషను ఉపయోగించండి
-- ప్రోత్సాహకరంగా మరియు సహాయకరంగా ఉండండి
-- ఆచరణాత్మక సలహాలు ఇవ్వండి
-- భారతీయ ఆర్థిక ఉత్పత్తులపై దృష్టి పెట్టండి (${terms.sip}, ${terms.ppf}, ${terms.elss})
-- ${terms.rupees} లో ఉదాహరణలు ఇవ్వండి
-
-ముఖ్యమైనది: ఎల్లప్పుడూ పూర్తి, సహాయకరమైన సమాధానాలు అందించండి. వాక్యాలను మధ్యలో వదిలేయవద్దు.`,
-
-        bengali: `আপনি ভারতীয় ব্যবহারকারীদের জন্য একজন বন্ধুত্বপূর্ণ AI অর্থ পরামর্শদাতা। ব্যবহারিক আর্থিক পরামর্শ প্রদান করুন।
-
-উত্তরের ধরন:
-- সম্পূর্ণ বাক্যে উত্তর দিন (কমপক্ষে 3-4টি বাক্য)
-- সহজ, দৈনন্দিন ভাষা ব্যবহার করুন
-- উৎসাহব্যঞ্জক এবং সহায়ক হন
-- ব্যবহারিক পরামর্শ দিন
-- ভারতীয় আর্থিক পণ্যগুলিতে মনোনিবেশ করুন (${terms.sip}, ${terms.ppf}, ${terms.elss})
-- ${terms.rupees} এ উদাহরণ দিন
-
-গুরুত্বপূর্ণ: সর্বদা সম্পূর্ণ, সহায়ক উত্তর প্রদান করুন। বাক্য মাঝখানে ছেড়ে দেবেন না।`,
-
-        english: `You are a friendly AI Finance Coach for Indian users. Provide helpful, practical financial advice in a conversational tone.
-
-RESPONSE STYLE:
-- Write complete sentences (minimum 3-4 sentences)
-- Use simple, everyday language
-- Be encouraging and supportive
-- Ask follow-up questions to engage the user
-- Use emojis sparingly (1-2 per response)
-- Focus on actionable next steps
-- Always provide complete, helpful responses
-
-CONTENT GUIDELINES:
-- Focus on Indian financial products (${terms.sip}, ${terms.ppf}, ${terms.elss}, etc.)
-- Use Indian currency (${terms.rupees}) in examples
-- Give practical, specific advice with examples
-- Always mention risk factors briefly
-- Suggest 2-3 concrete options with brief explanations
-- End with a question to continue the conversation
-
-TONE: Friendly financial advisor, not a textbook. Think "helpful friend who knows finance" rather than "formal financial consultant."
-
-IMPORTANT: Always provide complete, helpful responses. Never cut off mid-sentence. Ensure responses end with proper punctuation.`
+Example of good format: "Clearing off loans is a great goal. To start, I suggest looking at Debt Consolidation. This helps combine your loans. Another option is starting a small SIP."`
       }
 
       return basePrompts[language as keyof typeof basePrompts] || basePrompts.english
     }
 
-    const systemPrompt = `${getSystemPrompt(detectedLanguage)}
+    const messages = [
+      { role: 'system', content: getSystemPrompt(detectedLanguage) },
+      ...conversation_history,
+      { role: 'user', content: message }
+    ]
 
-Current conversation: ${conversation_history.length > 0 ? 
-  conversation_history.map(msg => `${msg.role}: ${msg.content}`).join('\n') : 'New conversation'
-}
-
-User question: ${message}
-
-Respond in ${detectedLanguage} with a complete, helpful answer. Ensure the response is grammatically correct and culturally appropriate.`
-
-    // Try models in order until one works
-    let lastError = null
     let workingModel = null
+    let aiResponse = ''
 
-    for (const model of GEMINI_MODELS) {
+    // Attempt to get response from Groq
+    for (const model of GROQ_MODELS) {
       try {
-        console.log(`Trying model: ${model}`)
-        const response = await callGeminiAPI(systemPrompt, model)
-        
+        const response = await callGroqAPI(messages, model)
         if (response.ok) {
           const data = await response.json()
-          
-          if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-            let aiResponse = data.candidates[0].content.parts[0].text.trim()
+          if (data.choices?.[0]?.message) {
+            aiResponse = data.choices[0].message.content
             workingModel = model
-            
-            // Check if response is complete, if not try to complete it
-            if (!isResponseComplete(aiResponse)) {
-              console.log('Response appears incomplete, attempting completion...')
-              aiResponse = await completeResponse(aiResponse, systemPrompt, model)
-            }
-            
-            return NextResponse.json({
-              response: aiResponse,
-              timestamp: new Date().toISOString(),
-              source: 'gemini',
-              model: model,
-              detected_language: detectedLanguage,
-              is_complete: isResponseComplete(aiResponse)
-            })
-          } else {
-            // Check for safety blocks or other issues
-            console.log('Unexpected response structure:', JSON.stringify(data, null, 2))
-            if (data.candidates && data.candidates[0] && data.candidates[0].finishReason) {
-              console.log('Finish reason:', data.candidates[0].finishReason)
-              
-              // If blocked by safety, try with a more neutral prompt
-              if (data.candidates[0].finishReason === 'SAFETY') {
-                console.log('Response blocked by safety filters, trying next model...')
-                continue
-              }
-            }
+            break
           }
-        } else {
-          const errorText = await response.text()
-          lastError = { status: response.status, statusText: response.statusText, details: errorText }
-          console.log(`Model ${model} failed:`, response.status, response.statusText)
-          
-          // If it's a rate limit error, return immediately with helpful message
-          if (response.status === 429) {
-            return NextResponse.json({
-              error: 'Rate limit exceeded. Please wait a moment and try again.',
-              details: 'You have exceeded the free tier quota for Gemini API. Please wait about 1 minute before trying again, or consider upgrading your API plan.',
-              api_error: true,
-              rate_limited: true,
-              model: model
-            }, { status: 429 })
-          }
-          
-          // Continue to next model for 404 errors
-          continue
         }
-      } catch (error) {
-        console.log(`Model ${model} error:`, error)
-        lastError = { error: error instanceof Error ? error.message : 'Unknown error' }
+      } catch (e) {
         continue
       }
     }
 
-    // If we get here, all models failed
-    console.error('All Gemini models failed. Last error:', lastError)
-    
+    if (!workingModel) {
+      return NextResponse.json({ error: 'AI models unavailable' }, { status: 500 })
+    }
+
+    // FINAL CLEANUP FOR TTS
+    // 1. Run the cleanTextForTTS regex function to strip any markdown symbols the AI might have slipped in.
+    const ttsFriendlyResponse = cleanTextForTTS(aiResponse)
+
     return NextResponse.json({
-      error: `All Gemini models failed. Last error: ${lastError?.status || 'Unknown'} ${lastError?.statusText || ''}`,
-      details: lastError?.details || lastError?.error || 'All available models returned errors',
-      api_error: true,
-      tried_models: GEMINI_MODELS
-    }, { status: lastError?.status || 500 })
+      response: ttsFriendlyResponse, // This is now clean text ready for voice
+      source: 'groq',
+      model: workingModel,
+      detected_language: detectedLanguage
+    })
 
   } catch (error) {
-    console.error('Chat API error:', error)
-    
-    return NextResponse.json({
-      error: 'Internal server error',
-      details: error instanceof Error ? error.message : 'Unknown error',
-      server_error: true
-    }, { status: 500 })
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }
 
 export async function GET() {
-  return NextResponse.json({
-    message: 'AI Finance Coach API is running',
-    status: 'healthy',
-    available_models: GEMINI_MODELS,
-    supported_languages: ['english', 'hindi', 'marathi', 'tamil', 'telugu', 'bengali'],
-    features: {
-      auto_language_detection: true,
-      response_completion: true,
-      multi_language_support: true,
-      truncation_handling: true
-    },
-    timestamp: new Date().toISOString(),
-    gemini_configured: !!(GEMINI_API_KEY && GEMINI_API_KEY.trim() !== ''),
-    setup_required: !(GEMINI_API_KEY && GEMINI_API_KEY.trim() !== '')
-  })
+  return NextResponse.json({ status: 'AI Voice-Finance API Ready' })
 }
