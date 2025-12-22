@@ -102,12 +102,12 @@ export const SUPPORTED_LANGUAGES: VoiceLanguage[] = [
  */
 export function getBrowserLanguage(): string {
   const browserLang = navigator.language || 'en-US'
-  
+
   // Check if browser language is supported
-  const supported = SUPPORTED_LANGUAGES.find(lang => 
+  const supported = SUPPORTED_LANGUAGES.find(lang =>
     lang.code === browserLang || lang.code.startsWith(browserLang.split('-')[0])
   )
-  
+
   return supported?.code || 'en-IN'
 }
 
@@ -116,9 +116,9 @@ export function getBrowserLanguage(): string {
  */
 export function getVoicesForLanguage(language: string): SpeechSynthesisVoice[] {
   if (!window.speechSynthesis) return []
-  
+
   const voices = window.speechSynthesis.getVoices()
-  return voices.filter(voice => 
+  return voices.filter(voice =>
     voice.lang.toLowerCase().includes(language.toLowerCase()) ||
     voice.lang.toLowerCase().startsWith(language.split('-')[0].toLowerCase())
   )
@@ -129,21 +129,21 @@ export function getVoicesForLanguage(language: string): SpeechSynthesisVoice[] {
  */
 export function getBestVoiceForLanguage(language: string): SpeechSynthesisVoice | null {
   const voices = getVoicesForLanguage(language)
-  
+
   if (voices.length === 0) return null
-  
+
   // Prefer local voices
   const localVoices = voices.filter(voice => voice.localService)
   if (localVoices.length > 0) {
     // Prefer female voices for better clarity
-    const femaleVoices = localVoices.filter(voice => 
-      voice.name.toLowerCase().includes('female') || 
+    const femaleVoices = localVoices.filter(voice =>
+      voice.name.toLowerCase().includes('female') ||
       voice.name.toLowerCase().includes('woman') ||
       !voice.name.toLowerCase().includes('male')
     )
     return femaleVoices[0] || localVoices[0]
   }
-  
+
   return voices[0]
 }
 
@@ -178,7 +178,7 @@ export function getSTTConfigForLanguage(language: string) {
     interimResults: true,
     maxAlternatives: 1,
   }
-  
+
   // Language-specific optimizations
   switch (language.split('-')[0]) {
     case 'hi':
@@ -202,7 +202,7 @@ export function getTTSConfigForLanguage(language: string) {
     volume: 1.0,
     lang: language
   }
-  
+
   // Language-specific optimizations
   switch (language.split('-')[0]) {
     case 'hi':
@@ -234,7 +234,7 @@ export function detectLanguageFromText(text: string): string {
   const kannadaRegex = /[\u0C80-\u0CFF]/
   const malayalamRegex = /[\u0D00-\u0D7F]/
   const gurmukhiRegex = /[\u0A00-\u0A7F]/
-  
+
   if (devanagariRegex.test(text)) {
     return 'hi-IN' // Hindi/Marathi (need more sophisticated detection)
   }
@@ -245,7 +245,7 @@ export function detectLanguageFromText(text: string): string {
   if (kannadaRegex.test(text)) return 'kn-IN'
   if (malayalamRegex.test(text)) return 'ml-IN'
   if (gurmukhiRegex.test(text)) return 'pa-IN'
-  
+
   return 'en-IN' // Default to English
 }
 
@@ -263,7 +263,7 @@ export function formatVoiceError(error: string): string {
     'service-not-allowed': 'Speech service not available.',
     'bad-grammar': 'Speech recognition grammar error.',
   }
-  
+
   return errorMessages[error] || `Voice error: ${error}`
 }
 
@@ -276,64 +276,64 @@ export class AudioLevelDetector {
   private microphone: MediaStreamAudioSourceNode | null = null
   private dataArray: Uint8Array | null = null
   private animationFrame: number | null = null
-  
+
   async initialize(): Promise<boolean> {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       this.audioContext = new AudioContext()
       this.analyser = this.audioContext.createAnalyser()
       this.microphone = this.audioContext.createMediaStreamSource(stream)
-      
+
       this.analyser.fftSize = 256
       this.dataArray = new Uint8Array(this.analyser.frequencyBinCount)
-      
+
       this.microphone.connect(this.analyser)
-      
+
       return true
     } catch (error) {
       console.error('Failed to initialize audio level detector:', error)
       return false
     }
   }
-  
+
   startMonitoring(callback: (level: number) => void): void {
     if (!this.analyser || !this.dataArray) return
-    
+
     const monitor = () => {
-      this.analyser!.getByteFrequencyData(this.dataArray!)
-      
+      this.analyser!.getByteFrequencyData(this.dataArray as any)
+
       // Calculate average volume
       const sum = this.dataArray!.reduce((a, b) => a + b, 0)
       const average = sum / this.dataArray!.length
       const level = average / 255 // Normalize to 0-1
-      
+
       callback(level)
       this.animationFrame = requestAnimationFrame(monitor)
     }
-    
+
     monitor()
   }
-  
+
   stopMonitoring(): void {
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame)
       this.animationFrame = null
     }
   }
-  
+
   destroy(): void {
     this.stopMonitoring()
-    
+
     if (this.microphone) {
       this.microphone.disconnect()
       this.microphone = null
     }
-    
+
     if (this.audioContext) {
       this.audioContext.close()
       this.audioContext = null
     }
-    
+
     this.analyser = null
     this.dataArray = null
   }
@@ -385,12 +385,12 @@ export const FINANCE_VOICE_PATTERNS = {
  */
 export function classifyVoiceIntent(text: string): string {
   const lowerText = text.toLowerCase()
-  
+
   for (const [category, patterns] of Object.entries(FINANCE_VOICE_PATTERNS)) {
     if (patterns.some(pattern => pattern.test(lowerText))) {
       return category
     }
   }
-  
+
   return 'general'
 }

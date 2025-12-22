@@ -52,7 +52,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
     t = (key: string, fallback?: string) => fallback || key
     ready = true
   }
-  
+
   // Don't render until i18n is ready
   if (!ready) {
     return (
@@ -64,7 +64,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
       </div>
     )
   }
-  
+
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -117,7 +117,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
       timestamp: new Date()
     }
     setMessages([welcomeMessage])
-    
+
     // Speak welcome message if auto-speak is enabled
     if (autoSpeak && voiceState.isSupported) {
       setTimeout(() => {
@@ -151,12 +151,12 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
 
     try {
       let response = ''
-      
+
       if (onSendMessage) {
         response = await onSendMessage(messageToSend)
       } else {
         // Default API call
-        const apiResponse = await fetch('http://localhost:8001/ai/finance-coach/chat', {
+        const apiResponse = await fetch('/api/ai-coach', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -184,9 +184,9 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
         content: response,
         timestamp: new Date()
       }
-      
+
       setMessages(prev => [...prev, assistantMessage])
-      
+
       // Auto-speak the response if enabled
       if (autoSpeak && voiceState.isSupported) {
         voiceActions.speak(response, ttsConfig)
@@ -258,7 +258,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             {voiceState.isSpeaking && (
               <motion.button
@@ -270,7 +270,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
                 <VolumeX className="w-4 h-4" />
               </motion.button>
             )}
-            
+
             <button
               onClick={() => setShowSettings(!showSettings)}
               className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
@@ -279,7 +279,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
             </button>
           </div>
         </div>
-        
+
         {/* Voice Settings Panel */}
         <AnimatePresence>
           {showSettings && (
@@ -343,11 +343,10 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
               exit={{ opacity: 0, scale: 0.95 }}
               className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`max-w-xs lg:max-w-md xl:max-w-lg ${
-                message.type === 'user' 
-                  ? 'bg-gradient-to-r from-primary-500 to-secondary-600 text-white' 
+              <div className={`max-w-xs lg:max-w-md xl:max-w-lg ${message.type === 'user'
+                  ? 'bg-gradient-to-r from-primary-500 to-secondary-600 text-white'
                   : 'bg-gray-100 text-gray-800'
-              } rounded-2xl px-4 py-3 shadow-lg`}>
+                } rounded-2xl px-4 py-3 shadow-lg`}>
                 <div className="flex items-start space-x-2">
                   {message.type === 'assistant' && (
                     <Bot className="w-4 h-4 mt-0.5 text-primary-600 flex-shrink-0" />
@@ -363,15 +362,14 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
                   <div className="flex-1 min-w-0">
                     <p className="text-sm leading-relaxed break-words">{message.content}</p>
                     <div className="flex items-center justify-between mt-2">
-                      <span className={`text-xs ${
-                        message.type === 'user' ? 'text-white/70' : 'text-gray-500'
-                      }`}>
-                        {message.timestamp.toLocaleTimeString([], { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
+                      <span className={`text-xs ${message.type === 'user' ? 'text-white/70' : 'text-gray-500'
+                        }`}>
+                        {message.timestamp.toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
                         })}
                       </span>
-                      
+
                       {message.type === 'assistant' && voiceState.isSupported && (
                         <button
                           onClick={() => handleSpeakMessage(message.content)}
@@ -387,7 +385,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
             </motion.div>
           ))}
         </AnimatePresence>
-        
+
         {isLoading && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -406,7 +404,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
             </div>
           </motion.div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -452,7 +450,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={voiceState.isSupported ? 
+              placeholder={voiceState.isSupported ?
                 t('aiCoach.placeholderVoice', 'Type your message or click the mic to speak...') :
                 t('aiCoach.placeholder', 'Type your message...')
               }
@@ -462,21 +460,20 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
               disabled={isLoading}
             />
           </div>
-          
+
           {voiceState.isSupported && (
             <button
               onClick={toggleListening}
               disabled={isLoading}
-              className={`p-3 rounded-2xl transition-all shadow-lg ${
-                voiceState.isListening 
-                  ? 'bg-red-500 text-white animate-pulse hover:bg-red-600' 
+              className={`p-3 rounded-2xl transition-all shadow-lg ${voiceState.isListening
+                  ? 'bg-red-500 text-white animate-pulse hover:bg-red-600'
                   : 'bg-gray-100 text-gray-600 hover:bg-primary-100 hover:text-primary-600'
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {voiceState.isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </button>
           )}
-          
+
           <button
             onClick={() => handleSendMessage()}
             disabled={!inputMessage.trim() || isLoading}

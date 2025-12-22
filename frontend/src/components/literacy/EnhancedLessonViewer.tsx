@@ -71,8 +71,8 @@ export default function EnhancedLessonViewer({ language }: EnhancedLessonViewerP
   const [loading, setLoading] = useState(false)
   const [activeSection, setActiveSection] = useState<'content' | 'videos' | 'articles' | 'schemes'>('content')
 
-  const fetchLesson = async (topic: string) => {    se
-tLoading(true)
+  const fetchLesson = async (topic: string) => {
+    setLoading(true)
     try {
       const response = await fetch(`/api/literacy/comprehensive-guide/${topic}?language=${language}`)
 
@@ -86,7 +86,7 @@ tLoading(true)
     } catch (error) {
       console.error('Error fetching lesson:', error)
       toast.error('Failed to load lesson. Please try again.')
-      
+
       // Enhanced fallback lesson
       setLesson({
         topic: topic,
@@ -194,4 +194,75 @@ Understanding ${topic} is crucial for your financial well-being. This lesson wil
       <div className="lg:col-span-1">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
-          animate={{ opaci
+          animate={{ opacity: 1, x: 0 }}
+          className="bg-white rounded-xl shadow-md overflow-hidden"
+        >
+          <div className="p-4 space-y-2">
+            {topics.map((topic) => (
+              <button
+                key={topic.id}
+                onClick={() => handleTopicSelect(topic.id)}
+                className={`w-full text-left p-3 rounded-lg transition-colors ${selectedTopic === topic.id
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'hover:bg-gray-50'
+                  }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <span className="text-xl">{topic.icon}</span>
+                  <div>
+                    <div className="font-medium">{topic.name}</div>
+                    <div className="text-xs text-gray-500">
+                      {topic.difficulty} • {topic.duration}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Content Area */}
+      <div className="lg:col-span-3">
+        {selectedTopic ? (
+          <div className="bg-white rounded-xl shadow-md p-6">
+            {loading ? (
+              <div className="flex justify-center p-12">
+                <Loader2 className="animate-spin w-8 h-8 text-blue-500" />
+              </div>
+            ) : lesson ? (
+              <div className="prose max-w-none">
+                {/* Basic content rendering */}
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold mb-4">{lesson.topic}</h2>
+                  <div className="whitespace-pre-wrap">{lesson.content}</div>
+                </div>
+
+                {/* Key Points */}
+                {lesson.key_points && (
+                  <div className="mb-6">
+                    <h3 className="text-xl font-bold mb-3">Key Takeaways</h3>
+                    <ul className="list-disc pl-5 space-y-2">
+                      {lesson.key_points.map((point, index) => (
+                        <li key={index}>{point}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                Failed to load lesson.
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-md p-12 text-center text-gray-500">
+            <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-20" />
+            <p>Select a topic to start learning</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

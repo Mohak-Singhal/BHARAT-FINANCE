@@ -118,9 +118,9 @@ export default function InvestmentForm({ onCalculate, loading }: InvestmentFormP
         />
         <p className="text-sm text-gray-500 mt-1">
           Typical range for {formData.investment_type.toUpperCase()}: {
-            investmentTypes.find(t => t.value === formData.investment_type)?.defaultRate
+            (investmentTypes.find(t => t.value === formData.investment_type)?.defaultRate || 0)
           }% - {
-            investmentTypes.find(t => t.value === formData.investment_type)?.defaultRate + 3
+            (investmentTypes.find(t => t.value === formData.investment_type)?.defaultRate || 0) + 3
           }%
         </p>
       </div>
@@ -224,8 +224,8 @@ export default function InvestmentForm({ onCalculate, loading }: InvestmentFormP
 
       {/* Disclaimer */}
       <div className="text-xs text-gray-500 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-        <strong>Disclaimer:</strong> These calculations are for educational purposes only. 
-        Actual returns may vary based on market conditions. Please consult a financial advisor 
+        <strong>Disclaimer:</strong> These calculations are for educational purposes only.
+        Actual returns may vary based on market conditions. Please consult a financial advisor
         before making investment decisions.
       </div>
     </form>

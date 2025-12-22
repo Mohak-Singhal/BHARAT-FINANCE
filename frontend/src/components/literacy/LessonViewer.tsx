@@ -20,6 +20,9 @@ interface Lesson {
     options: string[]
     correct: string
   }>
+  videos?: any[]
+  articles?: any[]
+  government_schemes?: any[]
 }
 
 const topics = [
@@ -56,7 +59,7 @@ export default function LessonViewer({ language }: LessonViewerProps) {
     } catch (error) {
       console.error('Error fetching lesson:', error)
       toast.error('Failed to load lesson. Please try again.')
-      
+
       // Fallback lesson content
       setLesson({
         topic: topic,
@@ -122,11 +125,10 @@ This lesson is designed to be easy to understand and implement in your daily fin
               <button
                 key={topic.id}
                 onClick={() => handleTopicSelect(topic.id)}
-                className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${
-                  selectedTopic === topic.id
-                    ? 'border-primary-200 bg-primary-50'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                }`}
+                className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${selectedTopic === topic.id
+                  ? 'border-primary-200 bg-primary-50'
+                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center">
@@ -135,7 +137,7 @@ This lesson is designed to be easy to understand and implement in your daily fin
                   </div>
                   <ChevronRight className="h-4 w-4 text-gray-400" />
                 </div>
-                
+
                 <div className="flex items-center space-x-3 text-sm">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(topic.difficulty)}`}>
                     {topic.difficulty}
@@ -257,8 +259,8 @@ This lesson is designed to be easy to understand and implement in your daily fin
                   {lesson.videos.map((video, index) => (
                     <div key={index} className="bg-white rounded-lg p-4 border border-red-200">
                       <div className="aspect-video mb-3">
-                        <img 
-                          src={video.thumbnail} 
+                        <img
+                          src={video.thumbnail}
                           alt={video.title}
                           className="w-full h-full object-cover rounded"
                         />
@@ -267,9 +269,9 @@ This lesson is designed to be easy to understand and implement in your daily fin
                       <p className="text-sm text-gray-600 mb-2 line-clamp-2">{video.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">{video.channel}</span>
-                        <a 
-                          href={video.url} 
-                          target="_blank" 
+                        <a
+                          href={video.url}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition-colors"
                         >
@@ -294,7 +296,7 @@ This lesson is designed to be easy to understand and implement in your daily fin
                       <div className="mb-3">
                         <h5 className="text-sm font-medium text-gray-900 mb-1">Key Points:</h5>
                         <ul className="text-sm text-gray-600 space-y-1">
-                          {article.key_points?.map((point, pointIndex) => (
+                          {article.key_points?.map((point: string, pointIndex: number) => (
                             <li key={pointIndex} className="flex items-start">
                               <span className="text-blue-600 mr-2">•</span>
                               {point}
@@ -304,9 +306,9 @@ This lesson is designed to be easy to understand and implement in your daily fin
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">Source: {article.source}</span>
-                        <a 
-                          href={article.url} 
-                          target="_blank" 
+                        <a
+                          href={article.url}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors"
                         >
@@ -333,11 +335,11 @@ This lesson is designed to be easy to understand and implement in your daily fin
                         </span>
                       </div>
                       <p className="text-sm text-gray-600 mb-3">{scheme.description}</p>
-                      
+
                       <div className="mb-3">
                         <h5 className="text-sm font-medium text-gray-900 mb-1">Benefits:</h5>
                         <ul className="text-sm text-gray-600 space-y-1">
-                          {scheme.benefits?.map((benefit, benefitIndex) => (
+                          {scheme.benefits?.map((benefit: string, benefitIndex: number) => (
                             <li key={benefitIndex} className="flex items-start">
                               <span className="text-green-600 mr-2">✓</span>
                               {benefit}
@@ -345,7 +347,7 @@ This lesson is designed to be easy to understand and implement in your daily fin
                           ))}
                         </ul>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="font-medium text-gray-900">Eligibility:</span>
@@ -356,12 +358,12 @@ This lesson is designed to be easy to understand and implement in your daily fin
                           <p className="text-gray-600">{scheme.how_to_apply}</p>
                         </div>
                       </div>
-                      
+
                       {scheme.official_website && (
                         <div className="mt-3">
-                          <a 
-                            href={scheme.official_website} 
-                            target="_blank" 
+                          <a
+                            href={scheme.official_website}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-colors"
                           >
@@ -374,6 +376,21 @@ This lesson is designed to be easy to understand and implement in your daily fin
                 </div>
               </div>
             )}
+
+            {/* Next Steps */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">🚀 Next Steps</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button className="flex items-center justify-center space-x-2 p-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200">
+                  <BookOpen className="h-4 w-4" />
+                  <span>Take Quiz</span>
+                </button>
+                <button className="flex items-center justify-center space-x-2 p-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors duration-200">
+                  <ChevronRight className="h-4 w-4" />
+                  <span>Next Lesson</span>
+                </button>
+              </div>
+            </div>
           </motion.div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
@@ -389,18 +406,4 @@ This lesson is designed to be easy to understand and implement in your daily fin
       </div>
     </div>
   )
-}         
-   {/* Next Steps */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">🚀 Next Steps</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button className="flex items-center justify-center space-x-2 p-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200">
-                  <BookOpen className="h-4 w-4" />
-                  <span>Take Quiz</span>
-                </button>
-                <button className="flex items-center justify-center space-x-2 p-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors duration-200">
-                  <ChevronRight className="h-4 w-4" />
-                  <span>Next Lesson</span>
-                </button>
-              </div>
-            </div>
+}
