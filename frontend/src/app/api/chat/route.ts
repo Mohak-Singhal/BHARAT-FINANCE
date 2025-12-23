@@ -4,12 +4,11 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
 
 const GROQ_MODELS = [
-  'llama-3.3-70b-versatile',   // 1. BEST. Superior reasoning & math. Use this primarily.
-  'llama-3.1-70b-versatile',   // 2. Backup. Good logic, but slightly older.
-  'llama-3.1-8b-instant'       // 3. Fallback. FAST but bad at math. Only use if others fail.
+  'llama-3.3-70b-versatile',  
+  'llama-3.1-70b-versatile',  
+  'llama-3.1-8b-instant'      
 ]
 
-// Language detection patterns
 const LANGUAGE_PATTERNS = {
   hindi: /[\u0900-\u097F]|नमस्ते|हैलो|कैसे|क्या|मैं|आप|है|हूं|करना|पैसा|निवेश|बचत/,
   marathi: /[\u0900-\u097F]|नमस्कार|कसे|काय|मी|तुम्ही|आहे|करणे|पैसे|गुंतवणूक/,
@@ -30,7 +29,7 @@ interface ChatRequest {
   preferred_language?: string
 }
 
-// Helper to clean text specifically for Text-to-Speech (TTS)
+// Clean text for TTS
 function cleanTextForTTS(text: string): string {
   return text
     .replace(/\*\*/g, '')         
@@ -45,57 +44,66 @@ function cleanTextForTTS(text: string): string {
     .trim()
 }
 
+// Detect language
 function detectLanguage(message: string): string {
   for (const [lang, pattern] of Object.entries(LANGUAGE_PATTERNS)) {
-    if (pattern.test(message)) {
-      return lang
-    }
+    if (pattern.test(message)) return lang
   }
   return 'english'
 }
 
-// UPDATED SYSTEM PROMPT WITH MATH GUARDRAILS
-const getSystemPrompt = (language: string) => {
-  const commonStrategy = `
-    CORE PHILOSOPHY:
-    1. **Empathy First:** Acknowledge the user's hard work and income limitations.
-    2. **Insurance is Priority #1:** Always check for health/life insurance before investments.
-    3. **Debt Strategy:** Aggressively pay off high-interest loans (credit card, personal loan).
+// Layered India-specific system prompts
+function getSystemPrompts(language: string) {
+  const basePrompt = `
+CORE PHILOSOPHY:
+1. Empathy first: respect user's income and constraints.
+2. Insurance priority: health/life insurance before investments.
+3. Debt strategy: aggressively pay off high-interest loans.
 
-    CRITICAL MATH & REALITY CHECKS (MUST FOLLOW):
-    1. **Do the Math First:** Before suggesting a monthly savings amount, calculate: Total Goal Amount divided by Number of Months.
-    2. **Reality Check:** If the calculated monthly savings is MORE than 40% of their monthly income, YOU MUST TELL THEM IT IS IMPOSSIBLE.
-       - *Example:* If User earns 20k and wants 4 Lakh in 6 months (requires ~66k/month), say: "To reach 4 Lakh in 6 months, you need to save 66,000 per month. This is more than your salary. We need to extend the timeline or reduce the goal."
-    3. **Do not hallucinate interest:** For short term (<1 year), assume 0% or simple 5-6% bank interest. Do not rely on compound interest magic for short periods.
+MATH CHECKS:
+1. Always calculate monthly savings: Total Goal / Months.
+2. If savings > 40% of income, inform user it's impossible.
+3. Assume 0–6% interest short-term, avoid compounding magic.
 
-    TTS FORMATTING RULES:
-    - Write in PLAIN TEXT only. No Markdown.
-    - Use short, spoken sentences.
-    - Speak numbers clearly (e.g., "66 thousand rupees").
-  `
+TTS RULES:
+- Plain text only, no markdown.
+- Short, spoken sentences.
+- Speak numbers in thousands/lakhs.
+`
 
-  const prompts = {
-    english: `You are a strategic Financial Mentor.
-    ${commonStrategy}
-    
-    Response Structure if Goal is Unrealistic:
-    "I did the math, and we have a challenge. To get [Goal Amount] in [Time], you need to save [Monthly Amount]. Since your salary is [Salary], this is not possible right now. Let's adjust the timeline."`,
+  const indiaContext = `
+INDIAN FINANCIAL CONTEXT:
+- Typical salaries: ₹15k–₹50k/month.
+- Instruments: FD, RD, PPF, EPF, Sukanya Samriddhi.
+- Interest rates realistic: 5–6% FD/RD, 7–8% PPF.
+- City cost-of-living: tier 1/2/3 guidance.
+`
 
-    hindi: `आप एक वित्तीय मेंटर हैं.
-    ${commonStrategy}
-    
-    महत्वपूर्ण: यदि लक्ष्य असंभव है (जैसे वेतन से अधिक बचत की आवश्यकता है), तो उपयोगकर्ता को स्पष्ट बताएं.
-    उदाहरण: "मैंने हिसाब लगाया है. 4 लाख जमा करने के लिए आपको हर महीने 66 हजार बचाने होंगे. चूँकि आपकी सैलरी 22 हजार है, यह 6 महीने में मुमकिन नहीं है. हमें या तो समय बढ़ाना होगा या लक्ष्य कम करना होगा."`,
-    
-    marathi: `You are a Financial Mentor speaking Marathi. Follow this logic: ${commonStrategy}. If the math shows the goal is impossible based on income, clearly explain why in Marathi.`,
-    tamil: `You are a Financial Mentor speaking Tamil. Follow this logic: ${commonStrategy}. If the math shows the goal is impossible based on income, clearly explain why in Tamil.`,
-    telugu: `You are a Financial Mentor speaking Telugu. Follow this logic: ${commonStrategy}. If the math shows the goal is impossible based on income, clearly explain why in Telugu.`,
-    bengali: `You are a Financial Mentor speaking Bengali. Follow this logic: ${commonStrategy}. If the math shows the goal is impossible based on income, clearly explain why in Bengali.`
+  const languageInstructions: Record<string, string> = {
+    english: 'Respond in English, TTS-ready, numbers in thousands/lakhs.',
+    hindi: 'उत्तर हिंदी में दें, बोलने योग्य, संख्याएँ हजार/लाख में।',
+    marathi: 'Marathi मध्ये उत्तर द्या, बोलण्यासाठी सोपे, संख्या हजार/लाख मध्ये.',
+    tamil: 'தமிழில் பதில் அளிக்கவும், சொல்லும் வகையில், எண்கள் ஆயிரம்/லட்சம்.',
+    telugu: 'తెలుగులో సమాధానం ఇవ్వండి, మాట్లాడటానికి సులభం, సంఖ్యలు వేలలో/లక్షల్లో.',
+    bengali: 'বাংলায় উত্তর দিন, সহজভাবে বলার জন্য, সংখ্যা হাজার/লক্ষ্যে।'
   }
 
-  return prompts[language as keyof typeof prompts] || prompts.english
+  const scenarioExamples = `
+EXAMPLES:
+1. Salary ₹22k, Goal ₹4 lakh in 6 months → Impossible. Suggest timelines: 12 months ₹33k/month, 18 months ₹22k/month.
+2. Want to buy bike ₹90k, Salary ₹25k → feasible 12 months ₹7.5k/month.
+3. Short-term saving ₹50k, Salary ₹20k → recommend FD/RD or bank saving schemes.
+`
+
+  return [
+    { role: 'system', content: basePrompt },
+    { role: 'system', content: indiaContext },
+    { role: 'system', content: languageInstructions[language] || languageInstructions.english },
+    { role: 'system', content: scenarioExamples }
+  ]
 }
 
+// Call Groq API
 async function callGroqAPI(messages: any[], modelName: string): Promise<any> {
   return await fetch(GROQ_API_URL, {
     method: 'POST',
@@ -105,11 +113,11 @@ async function callGroqAPI(messages: any[], modelName: string): Promise<any> {
     },
     body: JSON.stringify({
       model: modelName,
-      messages: messages,
-      temperature: 0.1, // DRASTICALLY REDUCED to ensure strict math adherence
+      messages,
+      temperature: 0.1,
       max_tokens: 1000,
       stream: false
-    }),
+    })
   })
 }
 
@@ -122,9 +130,8 @@ export async function POST(request: NextRequest) {
     if (!GROQ_API_KEY) return NextResponse.json({ error: 'API Key missing' }, { status: 503 })
 
     const detectedLanguage = preferred_language || detectLanguage(message)
-    
     const messages = [
-      { role: 'system', content: getSystemPrompt(detectedLanguage) },
+      ...getSystemPrompts(detectedLanguage),
       ...conversation_history,
       { role: 'user', content: message }
     ]
@@ -143,9 +150,7 @@ export async function POST(request: NextRequest) {
             break
           }
         }
-      } catch (e) {
-        continue
-      }
+      } catch (e) { continue }
     }
 
     if (!aiResponse) return NextResponse.json({ error: 'AI unavailable' }, { status: 500 })

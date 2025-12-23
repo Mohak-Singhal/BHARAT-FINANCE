@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Calculator, 
-  TrendingUp, 
-  DollarSign, 
+import {
+  Calculator,
+  TrendingUp,
+  DollarSign,
   Calendar,
   Target,
   PieChart,
@@ -13,6 +13,7 @@ import {
   Award,
   RefreshCw
 } from 'lucide-react';
+import * as investmentCalculators from '@/utils/investmentCalculators';
 
 interface InvestmentResult {
   investment_type: string;
@@ -55,36 +56,36 @@ const EnhancedInvestmentCalculator: React.FC = () => {
   const [selectedFund, setSelectedFund] = useState<string>('');
 
   const investmentTypes = [
-    { 
-      id: 'sip', 
-      name: 'SIP (Mutual Funds)', 
+    {
+      id: 'sip',
+      name: 'SIP (Mutual Funds)',
       description: 'Systematic Investment Plan',
       icon: <TrendingUp className="w-5 h-5" />,
       color: 'bg-blue-500',
       expectedReturn: '10-15%',
       risk: 'Market-linked'
     },
-    { 
-      id: 'ppf', 
-      name: 'PPF', 
+    {
+      id: 'ppf',
+      name: 'PPF',
       description: 'Public Provident Fund',
       icon: <Shield className="w-5 h-5" />,
       color: 'bg-green-500',
       expectedReturn: '7-8%',
       risk: 'Very Low'
     },
-    { 
-      id: 'nps', 
-      name: 'NPS', 
+    {
+      id: 'nps',
+      name: 'NPS',
       description: 'National Pension System',
       icon: <Award className="w-5 h-5" />,
       color: 'bg-purple-500',
       expectedReturn: '8-12%',
       risk: 'Moderate'
     },
-    { 
-      id: 'fd', 
-      name: 'Fixed Deposit', 
+    {
+      id: 'fd',
+      name: 'Fixed Deposit',
       description: 'Bank Fixed Deposit',
       icon: <DollarSign className="w-5 h-5" />,
       color: 'bg-orange-500',
@@ -98,10 +99,10 @@ const EnhancedInvestmentCalculator: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (monthlyAmount > 0 && years > 0) {
+    if (monthlyAmount > 0 && years > 0 && annualReturn > 0) {
       calculateInvestment();
     }
-  }, [investmentType, monthlyAmount, annualReturn, years, age]);
+  }, [investmentType, monthlyAmount, annualReturn, years]);
 
   const fetchTopFunds = async () => {
     try {
@@ -110,37 +111,27 @@ const EnhancedInvestmentCalculator: React.FC = () => {
       setTopFunds(data.top_performers || []);
     } catch (error) {
       console.error('Error fetching top funds:', error);
+      // Fail silently - mutual funds are optional
     }
   };
 
-  const calculateInvestment = async () => {
+  const calculateInvestment = () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8001/simulate/investment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          investment_type: investmentType,
-          monthly_amount: monthlyAmount,
-          annual_return_rate: annualReturn,
-          investment_period_years: years,
-          age: age,
-          inflation_rate: 6
-        }),
+      const result = investmentCalculators.calculateInvestment(investmentType, {
+        monthlyAmount,
+        annualReturn,
+        years,
+        inflationRate: 6
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setResult(data);
-      }
+      setResult(result);
     } catch (error) {
       console.error('Investment calculation error:', error);
     } finally {
       setLoading(false);
     }
   };
+
 
   const formatCurrency = (amount: number) => {
     if (amount >= 10000000) {
@@ -183,11 +174,10 @@ const EnhancedInvestmentCalculator: React.FC = () => {
                   <button
                     key={type.id}
                     onClick={() => setInvestmentType(type.id)}
-                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                      investmentType === type.id
-                        ? 'border-primary-500 bg-primary-50 shadow-lg'
-                        : 'border-gray-200 bg-white hover:border-primary-200 hover:shadow-md'
-                    }`}
+                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${investmentType === type.id
+                      ? 'border-primary-500 bg-primary-50 shadow-lg'
+                      : 'border-gray-200 bg-white hover:border-primary-200 hover:shadow-md'
+                      }`}
                   >
                     <div className="flex items-center space-x-3 mb-3">
                       <div className={`p-2 rounded-lg ${type.color} text-white`}>
@@ -440,9 +430,8 @@ const EnhancedInvestmentCalculator: React.FC = () => {
                           {Array.from({ length: 5 }, (_, i) => (
                             <span
                               key={i}
-                              className={`text-xs ${
-                                i < Math.floor(fund.rating!) ? 'text-yellow-400' : 'text-gray-300'
-                              }`}
+                              className={`text-xs ${i < Math.floor(fund.rating!) ? 'text-yellow-400' : 'text-gray-300'
+                                }`}
                             >
                               ★
                             </span>
@@ -497,21 +486,31 @@ const EnhancedInvestmentCalculator: React.FC = () => {
             <div className="pro-card">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Goal Planning</h3>
               <div className="space-y-4">
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <h4 className="font-semibold text-blue-800 text-sm">Emergency Fund</h4>
-                  <p className="text-xs text-blue-600 mb-2">6 months expenses</p>
-                  <div className="text-sm font-bold text-blue-800">₹3,00,000</div>
-                </div>
-                <div className="p-3 bg-green-50 rounded-lg">
-                  <h4 className="font-semibold text-green-800 text-sm">Home Down Payment</h4>
-                  <p className="text-xs text-green-600 mb-2">20% of property value</p>
-                  <div className="text-sm font-bold text-green-800">₹20,00,000</div>
-                </div>
-                <div className="p-3 bg-purple-50 rounded-lg">
-                  <h4 className="font-semibold text-purple-800 text-sm">Retirement Corpus</h4>
-                  <p className="text-xs text-purple-600 mb-2">25x annual expenses</p>
-                  <div className="text-sm font-bold text-purple-800">₹2,50,00,000</div>
-                </div>
+                {(() => {
+                  const monthlyIncome = monthlyAmount * 10; // Estimate income from investment amount
+                  const goals = investmentCalculators.calculateGoalSuggestions(age, monthlyIncome);
+
+                  return goals.map((goal, index) => {
+                    const colorClasses = {
+                      blue: 'bg-blue-50 text-blue-800',
+                      green: 'bg-green-50 text-green-800',
+                      purple: 'bg-purple-50 text-purple-800'
+                    };
+
+                    return (
+                      <div key={index} className={`p-3 ${colorClasses[goal.color as keyof typeof colorClasses]} rounded-lg`}>
+                        <h4 className={`font-semibold text-sm`}>{goal.name}</h4>
+                        <p className={`text-xs mb-2 opacity-80`}>{goal.description}</p>
+                        <div className="text-sm font-bold">{formatCurrency(goal.targetAmount)}</div>
+                        {result && result.maturity_amount >= goal.targetAmount && (
+                          <div className="mt-2 text-xs font-medium opacity-90">
+                            ✓ On track to achieve this goal!
+                          </div>
+                        )}
+                      </div>
+                    );
+                  });
+                })()}
               </div>
             </div>
           </div>

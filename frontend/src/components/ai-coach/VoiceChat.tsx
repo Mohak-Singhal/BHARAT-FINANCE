@@ -90,7 +90,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
     if (messagesContainerRef.current) {
       const container = messagesContainerRef.current
       const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100
-      
+
       if (isNearBottom) {
         const timer = setTimeout(scrollToBottom, 100)
         return () => clearTimeout(timer)
@@ -147,14 +147,14 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
         response = await onSendMessage(messageToSend)
       } else {
         // Call our Next.js API route
-        const apiResponse = await fetch('/api/chat', {
+        const apiResponse = await fetch('/api/ai-coach', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             message: messageToSend,
-            conversation_history: messages.slice(-5).map(m => ({
+            conversation_history: messages.slice(-10).map(m => ({
               role: m.type === 'user' ? 'user' : 'assistant',
               content: m.content
             }))
@@ -185,7 +185,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
     } catch (error) {
       console.error('Error sending message:', error)
       setError('Failed to get response. Please try again.')
-      
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
@@ -347,10 +347,10 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
       </div>
 
       {/* Messages Container - FIXED SCROLLING */}
-      <div 
+      <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-4"
-        style={{ 
+        style={{
           scrollBehavior: 'auto', // Changed from smooth to auto
           overflowAnchor: 'none' // Prevent scroll anchoring
         }}
@@ -365,8 +365,8 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
               className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div className={`max-w-xs lg:max-w-md xl:max-w-lg ${message.type === 'user'
-                  ? 'bg-gradient-to-r from-primary-500 to-secondary-600 text-white'
-                  : 'bg-gray-100 text-gray-800'
+                ? 'bg-gradient-to-r from-primary-500 to-secondary-600 text-white'
+                : 'bg-gray-100 text-gray-800'
                 } rounded-2xl px-4 py-3 shadow-lg`}>
                 <div className="flex items-start space-x-2">
                   {message.type === 'assistant' && (
@@ -518,8 +518,8 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
               onClick={toggleListening}
               disabled={isLoading}
               className={`p-3 rounded-2xl transition-all shadow-lg ${voiceState.isListening
-                  ? 'bg-red-500 text-white animate-pulse hover:bg-red-600'
-                  : 'bg-gray-100 text-gray-600 hover:bg-primary-100 hover:text-primary-600'
+                ? 'bg-red-500 text-white animate-pulse hover:bg-red-600'
+                : 'bg-gray-100 text-gray-600 hover:bg-primary-100 hover:text-primary-600'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {voiceState.isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
