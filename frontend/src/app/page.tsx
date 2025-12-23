@@ -8,14 +8,11 @@ import {
   Calculator, 
   Bot, 
   FileText, 
-  BookOpen, 
-  Wheat,
+  BookOpen,
   TrendingUp,
   Shield,
   Users,
   ArrowRight,
-  Star,
-  CheckCircle,
   Sparkles,
   Zap,
   Target,
@@ -26,61 +23,57 @@ import {
   Award,
   Rocket,
   Brain,
-  Heart,
-  Eye,
-  MousePointer
+  Heart
 } from 'lucide-react'
-import FeatureCard from '@/components/ui/FeatureCard'
 import StatsSection from '@/components/sections/StatsSection'
 import TestimonialSection from '@/components/sections/TestimonialSection'
 import ProfessionalDashboard from '@/components/dashboard/ProfessionalDashboard'
-import ModernDashboard from '@/components/dashboard/ModernDashboard'
 
 const features = [
   {
     icon: Calculator,
-    title: 'Smart Investment Calculator',
-    description: 'AI-powered SIP, PPF, NPS calculations with real-time mutual fund data',
+    title: 'features.investment.title',
+    description: 'features.investment.description',
     href: '/investment',
     color: 'from-blue-500 to-cyan-500',
     gradient: 'bg-gradient-to-br from-blue-50 to-cyan-50'
   },
   {
     icon: BarChart3,
-    title: 'Professional Budget Analyzer',
-    description: 'Intelligent expense tracking with personalized recommendations',
+    title: 'features.budget.title',
+    description: 'features.budget.description',
     href: '/budget',
     color: 'from-purple-500 to-pink-500',
     gradient: 'bg-gradient-to-br from-purple-50 to-pink-50'
   },
   {
     icon: Bot,
-    title: 'AI Finance Coach',
-    description: 'Get personalized financial advice from our advanced AI assistant',
+    title: 'features.aiCoach.title',
+    description: 'features.aiCoach.description',
     href: '/ai-coach',
     color: 'from-emerald-500 to-teal-500',
     gradient: 'bg-gradient-to-br from-emerald-50 to-teal-50'
   },
   {
     icon: PieChart,
-    title: 'Mutual Fund Recommendations',
-    description: 'Real-time fund analysis with performance metrics and ratings',
+    title: 'features.mutualFunds.title',
+    description: 'features.mutualFunds.description',
     href: '/mutual-funds',
     color: 'from-orange-500 to-red-500',
     gradient: 'bg-gradient-to-br from-orange-50 to-red-50'
   },
   {
     icon: FileText,
-    title: 'Policy Impact Simulator',
-    description: 'Understand how government policies affect your finances',
+    title: 'features.policy.title',
+    description: 'features.policy.description',
     href: '/policy-simulator',
     color: 'from-indigo-500 to-purple-500',
     gradient: 'bg-gradient-to-br from-indigo-50 to-purple-50'
   },
   {
     icon: BookOpen,
-    title: 'Multi-language Learning',
-    description: 'Financial education in 6+ Indian languages with interactive content',
+    title: 'features.literacy.title',
+    description: 'features.literacy.description',
     href: '/literacy',
     color: 'from-rose-500 to-pink-500',
     gradient: 'bg-gradient-to-br from-rose-50 to-pink-50'
@@ -88,10 +81,10 @@ const features = [
 ]
 
 const stats = [
-  { label: 'Active Users', value: '50K+', icon: Users },
-  { label: 'Calculations Done', value: '1M+', icon: Calculator },
-  { label: 'Languages Supported', value: '6+', icon: Globe },
-  { label: 'Success Rate', value: '98%', icon: Target },
+  { label: 'stats.users', value: '50K+', icon: Users },
+  { label: 'stats.calculations', value: '1M+', icon: Calculator },
+  { label: 'stats.languages', value: '6+', icon: Globe },
+  { label: 'stats.success', value: '98%', icon: Target },
 ]
 
 const floatingElements = [
@@ -234,9 +227,9 @@ export default function HomePage() {
             transition={{ duration: 1, delay: 0.3 }}
             className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold mb-8 leading-tight"
           >
-            <span className="block">{t('hero.title').split(' ')[0]} {t('hero.title').split(' ')[1]}</span>
+            <span className="block">{t('hero.title_part1')}</span>
             <span className="block bg-gradient-to-r from-primary-600 via-secondary-600 to-purple-600 bg-clip-text text-transparent">
-              {t('hero.title').split(' ').slice(2).join(' ')}
+              {t('hero.title_part2')}
             </span>
           </motion.h1>
 
@@ -304,7 +297,7 @@ export default function HomePage() {
                   <stat.icon className="w-8 h-8 text-primary-600" />
                 </div>
                 <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
-                <div className="text-gray-600 font-medium">{stat.label}</div>
+                <div className="text-gray-600 font-medium">{t(stat.label)}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -370,13 +363,13 @@ export default function HomePage() {
                       <feature.icon className="w-8 h-8 text-white" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary-600 transition-colors duration-300">
-                      {feature.title}
+                      {t(feature.title)}
                     </h3>
                     <p className="text-gray-600 leading-relaxed mb-6">
-                      {feature.description}
+                      {t(feature.description)}
                     </p>
                     <div className="flex items-center text-primary-600 font-semibold group-hover:translate-x-2 transition-transform duration-300">
-                      <span>Explore Feature</span>
+                      <span>{t('common.exploreFeature')}</span>
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </div>
                   </div>

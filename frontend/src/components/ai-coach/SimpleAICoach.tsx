@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Send, Bot, User, Loader2, RefreshCw, Copy, Mic, MicOff, Volume2, VolumeX, Settings } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface Message {
   id: string
@@ -22,6 +23,7 @@ const TTS_LANGUAGE_MAP: { [key: string]: string } = {
 }
 
 const SimpleAICoach: React.FC = () => {
+  const { t } = useTranslation()
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -223,10 +225,7 @@ const SimpleAICoach: React.FC = () => {
 
     // Speak welcome message only once if auto-speak is enabled
     if (autoSpeak && isVoiceSupported) {
-      const timer = setTimeout(() => {
-        speakText(welcomeMessage.content)
-      }, 1000)
-      return () => clearTimeout(timer)
+      speakText(welcomeMessage.content)
     }
   }, []) // Removed dependencies to prevent re-running
 
@@ -382,12 +381,12 @@ const SimpleAICoach: React.FC = () => {
   }
 
   const quickSuggestions = [
-    'I want to buy a house in 5 years',
-    'How do I start investing with ₹5000?',
-    'Best tax-saving options for me',
-    'Should I invest lump sum or SIP?',
-    'Help me create a budget',
-    'Emergency fund - how much do I need?',
+    t('aiCoach.suggestions.house', 'I want to buy a house in 5 years'),
+    t('aiCoach.suggestions.investment', 'How do I start investing with ₹5000?'),
+    t('aiCoach.suggestions.tax', 'Best tax-saving options for me'),
+    t('aiCoach.suggestions.sip', 'Should I invest lump sum or SIP?'),
+    t('aiCoach.suggestions.budget', 'Help me create a budget'),
+    t('aiCoach.suggestions.emergency', 'Emergency fund - how much do I need?'),
     // Multi-language suggestions
     'मैं 5 साल में घर खरीदना चाहता हूं',
     '₹5000 से निवेश कैसे शुरू करूं?',
@@ -405,9 +404,9 @@ const SimpleAICoach: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            AI Finance Coach
+            {t('aiCoach.title', 'AI Finance Coach')}
           </h1>
-          <p className="text-gray-600">Your personal financial advisor powered by Groq Llama 3</p>
+          <p className="text-gray-600">{t('aiCoach.subtitle', 'Your personal financial advisor powered by Groq Llama 3')}</p>
         </div>
 
         {/* Chat Container */}
@@ -549,7 +548,7 @@ const SimpleAICoach: React.FC = () => {
                       <div className="flex items-center space-x-1">
                         <User className="w-4 h-4 mt-0.5 flex-shrink-0" />
                         {message.isVoice && (
-                          <Mic className="w-3 h-3 mt-0.5 opacity-70" title="Voice input" />
+                          <Mic className="w-3 h-3 mt-0.5 opacity-70" />
                         )}
                       </div>
                     )}
