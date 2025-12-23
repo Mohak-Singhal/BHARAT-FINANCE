@@ -13,7 +13,7 @@ export default function TestVoicePage() {
     const sttSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition)
     const ttsSupported = !!window.speechSynthesis
     setIsSupported(sttSupported && ttsSupported)
-    
+
     if (sttSupported && ttsSupported) {
       setTestResult('✅ Full voice support available')
     } else if (sttSupported) {
@@ -42,16 +42,16 @@ export default function TestVoicePage() {
       recognition.continuous = false
       recognition.interimResults = false
       recognition.lang = 'en-IN'
-      
+
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript
         setTestResult(`🎤 Heard: "${transcript}"`)
       }
-      
+
       recognition.onerror = (event) => {
         setTestResult(`❌ Error: ${event.error}`)
       }
-      
+
       recognition.start()
       setTestResult('🎤 Listening... (speak now)')
     }
@@ -71,13 +71,13 @@ export default function TestVoicePage() {
               Voice Integration Test
             </span>
           </div>
-          
+
           <h1 className="text-4xl font-bold mb-4">
             <span className="bg-gradient-to-r from-primary-600 via-secondary-600 to-purple-600 bg-clip-text text-transparent">
               Voice Test Page
             </span>
           </h1>
-          
+
           <p className="text-xl text-gray-600">
             Test the voice integration functionality
           </p>
@@ -92,9 +92,8 @@ export default function TestVoicePage() {
             {/* Status */}
             <div className="text-center">
               <h2 className="text-2xl font-bold mb-4">Voice Support Status</h2>
-              <div className={`p-4 rounded-xl ${
-                isSupported ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-              }`}>
+              <div className={`p-4 rounded-xl ${isSupported ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                }`}>
                 <p className="text-lg font-medium">{testResult}</p>
               </div>
             </div>
@@ -109,7 +108,7 @@ export default function TestVoicePage() {
                   <Volume2 className="w-5 h-5" />
                   <span>Test Text-to-Speech</span>
                 </button>
-                
+
                 <button
                   onClick={testSTT}
                   className="p-4 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors flex items-center justify-center space-x-2"
@@ -124,9 +123,9 @@ export default function TestVoicePage() {
             <div className="bg-gray-50 rounded-xl p-4">
               <h3 className="font-bold mb-2">Browser Information</h3>
               <div className="text-sm text-gray-600 space-y-1">
-                <p>User Agent: {navigator.userAgent}</p>
-                <p>Language: {navigator.language}</p>
-                <p>Platform: {navigator.platform}</p>
+                <p>User Agent: {typeof navigator !== 'undefined' ? navigator.userAgent : 'Server'}</p>
+                <p>Language: {typeof navigator !== 'undefined' ? navigator.language : 'Unknown'}</p>
+                <p>Platform: {typeof navigator !== 'undefined' ? navigator.platform : 'Unknown'}</p>
               </div>
             </div>
 

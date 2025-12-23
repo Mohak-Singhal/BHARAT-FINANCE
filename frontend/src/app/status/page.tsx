@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { 
-  CheckCircle, 
-  XCircle, 
+import {
+  CheckCircle,
+  XCircle,
   AlertCircle,
   Mic,
   Volume2,
@@ -34,7 +34,7 @@ export default function StatusPage() {
       systemChecks.push({
         name: 'HTTPS Connection',
         status: window.location.protocol === 'https:' ? 'success' : 'warning',
-        message: window.location.protocol === 'https:' 
+        message: window.location.protocol === 'https:'
           ? 'Secure connection - Voice features fully supported'
           : 'HTTP connection - Voice features may be limited',
         icon: Shield
@@ -45,7 +45,7 @@ export default function StatusPage() {
       systemChecks.push({
         name: 'Speech Recognition',
         status: sttSupported ? 'success' : 'error',
-        message: sttSupported 
+        message: sttSupported
           ? 'Speech-to-Text is supported'
           : 'Speech-to-Text not supported in this browser',
         icon: Mic
@@ -56,7 +56,7 @@ export default function StatusPage() {
       systemChecks.push({
         name: 'Speech Synthesis',
         status: ttsSupported ? 'success' : 'error',
-        message: ttsSupported 
+        message: ttsSupported
           ? 'Text-to-Speech is supported'
           : 'Text-to-Speech not supported in this browser',
         icon: Volume2
@@ -66,7 +66,7 @@ export default function StatusPage() {
       const userAgent = navigator.userAgent
       let browserStatus: 'success' | 'warning' | 'error' = 'success'
       let browserMessage = 'Fully supported browser'
-      
+
       if (userAgent.includes('Chrome') || userAgent.includes('Edge')) {
         browserStatus = 'success'
         browserMessage = 'Chrome/Edge - Full voice support'
@@ -100,14 +100,14 @@ export default function StatusPage() {
       // Check Language Support
       const languages = navigator.languages || [navigator.language]
       const supportedLanguages = ['en', 'hi', 'ta', 'te', 'bn', 'gu', 'kn', 'ml', 'mr', 'pa']
-      const hasIndianLanguage = languages.some(lang => 
+      const hasIndianLanguage = languages.some(lang =>
         supportedLanguages.some(supported => lang.startsWith(supported))
       )
 
       systemChecks.push({
         name: 'Language Support',
         status: hasIndianLanguage ? 'success' : 'warning',
-        message: hasIndianLanguage 
+        message: hasIndianLanguage
           ? 'Indian language detected in browser'
           : 'No Indian languages detected - English will be used',
         icon: Globe
@@ -117,7 +117,7 @@ export default function StatusPage() {
       systemChecks.push({
         name: 'Network Connection',
         status: navigator.onLine ? 'success' : 'error',
-        message: navigator.onLine 
+        message: navigator.onLine
           ? 'Online - All features available'
           : 'Offline - Limited functionality',
         icon: Wifi
@@ -158,7 +158,7 @@ export default function StatusPage() {
 
   const overallStatus = checks.length > 0 ? (
     checks.every(check => check.status === 'success') ? 'success' :
-    checks.some(check => check.status === 'error') ? 'error' : 'warning'
+      checks.some(check => check.status === 'error') ? 'error' : 'warning'
   ) : 'warning'
 
   return (
@@ -209,7 +209,7 @@ export default function StatusPage() {
           className="bg-white/90 backdrop-blur-xl rounded-2xl p-8 shadow-xl border border-white/20"
         >
           <h2 className="text-2xl font-bold mb-6">System Checks</h2>
-          
+
           {isLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-3"></div>
@@ -244,11 +244,11 @@ export default function StatusPage() {
           <div className="mt-8 p-4 bg-gray-50 rounded-xl">
             <h3 className="font-bold text-gray-900 mb-2">Browser Information</h3>
             <div className="text-sm text-gray-600 space-y-1">
-              <p><strong>User Agent:</strong> {navigator.userAgent}</p>
-              <p><strong>Language:</strong> {navigator.language}</p>
-              <p><strong>Languages:</strong> {navigator.languages?.join(', ')}</p>
-              <p><strong>Platform:</strong> {navigator.platform}</p>
-              <p><strong>Online:</strong> {navigator.onLine ? 'Yes' : 'No'}</p>
+              <p><strong>User Agent:</strong> {typeof navigator !== 'undefined' ? navigator.userAgent : 'Server'}</p>
+              <p><strong>Language:</strong> {typeof navigator !== 'undefined' ? navigator.language : 'Unknown'}</p>
+              <p><strong>Languages:</strong> {typeof navigator !== 'undefined' ? navigator.languages?.join(', ') : 'Unknown'}</p>
+              <p><strong>Platform:</strong> {typeof navigator !== 'undefined' ? navigator.platform : 'Unknown'}</p>
+              <p><strong>Online:</strong> {typeof navigator !== 'undefined' ? (navigator.onLine ? 'Yes' : 'No') : 'Unknown'}</p>
             </div>
           </div>
 
