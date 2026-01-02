@@ -1,4 +1,4 @@
-# Bharat Finance Platform - Frontend
+# Bharat Finance Platform
 
 A modern, responsive Next.js frontend for the Bharat Finance & Policy Simulator platform.
 
