@@ -239,51 +239,48 @@ class LearningService {
   }
 
   private getMockVideos(query: string, options: SearchOptions): VideoResult[] {
-    const mockVideos: VideoResult[] = [
-      {
-        id: 'mock_1',
-        title: `Complete Guide to ${query} for Beginners`,
-        thumbnail: '',
-        channel: 'Financial Education Hub',
-        url: `https://www.youtube.com/results?search_query=${encodeURIComponent(query + ' finance')}`,
-        description: `Learn everything about ${query} in this comprehensive tutorial designed for beginners.`,
-      },
-      {
-        id: 'mock_2',
-        title: `${query} Explained in Simple Terms`,
-        thumbnail: '',
-        channel: 'Money Matters',
-        url: `https://www.youtube.com/results?search_query=${encodeURIComponent(query + ' explained')}`,
-        description: `Simple explanation of ${query} concepts with practical examples.`,
-      },
-      {
-        id: 'mock_3',
-        title: `Advanced ${query} Strategies`,
-        thumbnail: '',
-        channel: 'Investment Academy',
-        url: `https://www.youtube.com/results?search_query=${encodeURIComponent(query + ' strategies')}`,
-        description: `Advanced strategies and tips for ${query} from industry experts.`,
-      },
-      {
-        id: 'mock_4',
-        title: `${query} Case Studies and Examples`,
-        thumbnail: '',
-        channel: 'Finance Simplified',
-        url: `https://www.youtube.com/results?search_query=${encodeURIComponent(query + ' case study')}`,
-        description: `Real-world case studies and examples of ${query} in action.`,
-      },
-      {
-        id: 'mock_5',
-        title: `Common ${query} Mistakes to Avoid`,
-        thumbnail: '',
-        channel: 'Smart Money',
-        url: `https://www.youtube.com/results?search_query=${encodeURIComponent(query + ' mistakes')}`,
-        description: `Learn about common mistakes people make with ${query} and how to avoid them.`,
-      },
+    const realVideos = [
+      { id: 'v684N5MLajA', channel: 'Upasana Kou | Personal Finance TV' },
+      { id: 'YSux7rtMo9k', channel: 'INDmoney' },
+      { id: '0dN_SjDlAZY', channel: 'Mahendra Dogney' },
+      { id: 'yIiSrszJUy0', channel: 'Macro Café' },
+      { id: '6sq2o1atWLY', channel: 'Zerodha Varsity' },
+      { id: 'BKTN4C0m6MY', channel: 'Ranveer Allahbadia' },
+      { id: '8A3s9WP_7l4', channel: 'Dhruv Rathee' },
+      { id: '1abxL2U0y0U', channel: 'Investing With Upsurge' },
+      { id: '3UF0ymVdYLA', channel: 'Pranjal Kamra' },
+      { id: 'gv20filGA7o', channel: 'Neeraj Joshi' },
+      { id: 'T7JHfLGm_GY', channel: 'warikoo' },
+      { id: 'FAGJ0ST-kXs', channel: 'XY- Axis Education' },
+      { id: 'TmC_mgrDWRI', channel: 'Policybazaar' },
+      { id: 'pado678nYbg', channel: 'Vaani Wealth' },
+    ]
+
+    const titles = [
+      `Complete Guide to ${query} for Beginners`,
+      `${query} Explained in Simple Terms`,
+      `Advanced ${query} Strategies`,
+      `${query} Case Studies and Examples`,
+      `Common ${query} Mistakes to Avoid`,
+    ]
+
+    const descriptions = [
+      `Learn everything about ${query} in this comprehensive tutorial designed for beginners.`,
+      `Simple explanation of ${query} concepts with practical examples.`,
+      `Advanced strategies and tips for ${query} from industry experts.`,
+      `Real-world case studies and examples of ${query} in action.`,
+      `Learn about common mistakes people make with ${query} and how to avoid them.`,
     ]
 
     const maxResults = options.maxResults || 10
-    return mockVideos.slice(0, maxResults)
+    return realVideos.slice(0, maxResults).map((video, index) => ({
+      ...video,
+      title: titles[index % titles.length],
+      thumbnail: `https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`,
+      url: `https://www.youtube.com/watch?v=${video.id}`,
+      description: descriptions[index % descriptions.length],
+      publishedAt: new Date().toISOString(),
+    }))
   }
 
   private getFromCache(key: string): unknown | null {
