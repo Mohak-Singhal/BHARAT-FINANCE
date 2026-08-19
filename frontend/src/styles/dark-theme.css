@@ -77,6 +77,35 @@
 .dark .bg-stone-50 { background-color: #17150f; }
 .dark .bg-stone-100 { background-color: #1e1b13; }
 
+/* ---------- Gradient white/gray overrides (page backgrounds) ---------- */
+.dark .via-white { --tw-gradient-via: #0d0d0d; }
+.dark .via-gray-50 { --tw-gradient-via: #0d0d0d; }
+.dark .via-gray-100 { --tw-gradient-via: #1f1f1f; }
+.dark .from-gray-50 { --tw-gradient-from: #0d0d0d; }
+.dark .to-gray-50 { --tw-gradient-to: #0d0d0d; }
+.dark .from-gray-100 { --tw-gradient-from: #1f1f1f; }
+.dark .to-gray-100 { --tw-gradient-to: #1f1f1f; }
+.dark .from-white { --tw-gradient-from: #121212; }
+.dark .to-white { --tw-gradient-to: #070707; }
+
+/* ---------- Custom palette (success/warning/error) tints ---------- */
+.dark .bg-success-50 { background-color: #0f2518; }
+.dark .bg-success-100 { background-color: #12301d; }
+.dark .bg-warning-50 { background-color: #2a2010; }
+.dark .bg-warning-100 { background-color: #33260f; }
+.dark .bg-error-50 { background-color: #2e1114; }
+.dark .bg-error-100 { background-color: #3a1519; }
+
+/* ---------- Semi-transparent tint backgrounds ---------- */
+.dark .bg-orange-50\/40 { background-color: rgba(42, 32, 16, 0.4); }
+.dark .bg-primary-50\/40 { background-color: rgba(42, 28, 16, 0.4); }
+
+/* ---------- Light borders -> dark ---------- */
+.dark .border-gray-50 { border-color: rgba(255, 255, 255, 0.08); }
+.dark .border-primary-100 { border-color: rgba(253, 186, 116, 0.25); }
+.dark .border-primary-300 { border-color: rgba(253, 186, 116, 0.4); }
+.dark .border-primary-400 { border-color: rgba(251, 146, 60, 0.5); }
+
 /* ---------- Gradient tint overrides (light 50/100 tints -> dark) ---------- */
 .dark .from-primary-50 { --tw-gradient-from: #2a1c10; }
 .dark .from-primary-100 { --tw-gradient-from: #33200f; }
