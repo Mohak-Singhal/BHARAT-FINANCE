@@ -23,7 +23,9 @@ import {
   Award,
   Rocket,
   Brain,
-  Heart
+  Heart,
+  LineChart,
+  Newspaper
 } from 'lucide-react'
 import StatsSection from '@/components/sections/StatsSection'
 import TestimonialSection from '@/components/sections/TestimonialSection'
@@ -74,9 +76,25 @@ const features = [
     icon: BookOpen,
     title: 'features.literacy.title',
     description: 'features.literacy.description',
-    href: '/literacy',
+    href: '/learning',
     color: 'from-rose-500 to-pink-500',
     gradient: 'bg-gradient-to-br from-rose-50 to-pink-50'
+  },
+  {
+    icon: LineChart,
+    title: 'features.stocks.title',
+    description: 'features.stocks.description',
+    href: '/stocks',
+    color: 'from-teal-500 to-cyan-500',
+    gradient: 'bg-gradient-to-br from-teal-50 to-cyan-50'
+  },
+  {
+    icon: Newspaper,
+    title: 'features.news.title',
+    description: 'features.news.description',
+    href: '/news',
+    color: 'from-amber-500 to-orange-500',
+    gradient: 'bg-gradient-to-br from-amber-50 to-orange-50'
   },
 ]
 

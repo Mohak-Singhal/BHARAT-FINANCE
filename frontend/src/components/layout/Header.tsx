@@ -18,7 +18,9 @@ import {
   ChevronDown,
   TrendingUp,
   BarChart3,
-  PieChart
+  PieChart,
+  LineChart,
+  Newspaper
 } from 'lucide-react'
 import { clsx } from 'clsx'
 
@@ -35,8 +37,10 @@ const mainNavigation = [
       { name: 'nav.policySimulator', href: '/policy-simulator', icon: FileText },
     ]
   },
+  { name: 'nav.stocks', href: '/stocks', icon: LineChart },
   { name: 'nav.aiCoach', href: '/ai-coach', icon: Bot },
-  { name: 'nav.learning', href: '/literacy', icon: BookOpen },
+  { name: 'nav.learning', href: '/learning', icon: BookOpen },
+  { name: 'nav.news', href: '/news', icon: Newspaper },
   { name: 'nav.mandi', href: '/mandi', icon: Wheat },
 ]
 

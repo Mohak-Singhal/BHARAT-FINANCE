@@ -43,6 +43,8 @@ const enTranslation = {
     "policySimulator": "Policy Simulator",
     "aiCoach": "AI Coach",
     "learning": "Financial Learning",
+    "stocks": "Stocks",
+    "news": "News",
     "mandi": "Mandi Prices"
   },
   "features": {
@@ -69,6 +71,14 @@ const enTranslation = {
     "literacy": {
       "title": "Multi-language Learning",
       "description": "Financial education in 6+ Indian languages with interactive content"
+    },
+    "stocks": {
+      "title": "Stock Tracker",
+      "description": "Track real-time stock prices and build your personal watchlist"
+    },
+    "news": {
+      "title": "Financial News Feed",
+      "description": "Follow topics that matter and get the latest finance updates"
     }
   },
   "stats": {

@@ -11,7 +11,9 @@ import {
   Bot,
   FileText,
   BookOpen,
-  Wheat
+  Wheat,
+  LineChart,
+  Newspaper
 } from 'lucide-react'
 
 const footerNavigation = {
@@ -20,6 +22,8 @@ const footerNavigation = {
     { name: 'AI Finance Coach', href: '/ai-coach', icon: Bot },
     { name: 'Policy Simulator', href: '/policy', icon: FileText },
     { name: 'Financial Literacy', href: '/literacy', icon: BookOpen },
+    { name: 'Stock Tracker', href: '/stocks', icon: LineChart },
+    { name: 'Financial News', href: '/news', icon: Newspaper },
     { name: 'Mandi Support', href: '/mandi', icon: Wheat },
   ],
   resources: [

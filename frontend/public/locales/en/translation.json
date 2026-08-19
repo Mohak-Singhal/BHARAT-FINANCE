@@ -8,7 +8,7 @@
   },
   "nav": {
     "home": "Home",
-    "dashboard": "Dashboard", 
+    "dashboard": "Dashboard",
     "tools": "Tools",
     "investment": "Investment Calculator",
     "budget": "Budget Analyzer",
@@ -16,7 +16,9 @@
     "policySimulator": "Policy Simulator",
     "aiCoach": "AI Coach",
     "learning": "Financial Learning",
-    "mandi": "Mandi Prices"
+    "mandi": "Mandi Prices",
+    "stocks": "Stocks",
+    "news": "News"
   },
   "features": {
     "investment": {
@@ -24,7 +26,7 @@
       "description": "AI-powered SIP, PPF, NPS calculations with real-time mutual fund data"
     },
     "budget": {
-      "title": "Professional Budget Analyzer", 
+      "title": "Professional Budget Analyzer",
       "description": "Intelligent expense tracking with personalized recommendations"
     },
     "aiCoach": {
@@ -42,11 +44,19 @@
     "literacy": {
       "title": "Multi-language Learning",
       "description": "Financial education in 6+ Indian languages with interactive content"
+    },
+    "stocks": {
+      "title": "Stock Tracker",
+      "description": "Track real-time stock prices and build your personal watchlist"
+    },
+    "news": {
+      "title": "Financial News Feed",
+      "description": "Follow topics that matter and get the latest finance updates"
     }
   },
   "stats": {
     "users": "Active Users",
-    "calculations": "Calculations Done", 
+    "calculations": "Calculations Done",
     "languages": "Languages Supported",
     "success": "Success Rate"
   },
