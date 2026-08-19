@@ -147,7 +147,7 @@ export default function HomePage() {
     <div className="min-h-screen overflow-hidden">
       {/* Animated Background */}
       <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-[#0d1420] dark:via-[#070707] dark:to-[#1a1226]" />
         
         {/* Floating Geometric Shapes */}
         {floatingElements.map((element, index) => (
@@ -399,7 +399,7 @@ export default function HomePage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-32 bg-gradient-to-br from-gray-50 to-white px-4 sm:px-6 lg:px-8">
+      <section className="py-32 bg-gradient-to-br from-gray-50 to-white px-4 sm:px-6 lg:px-8 dark:from-[#0d0d0d] dark:to-[#070707]">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}

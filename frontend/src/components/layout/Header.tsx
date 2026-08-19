@@ -45,6 +45,7 @@ const mainNavigation = [
 ]
 
 import { languages, loadLanguage } from '@/lib/i18n'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -81,7 +82,7 @@ export default function Header() {
   const currentLang = Object.entries(languages).find(([code]) => code === i18n.language)?.[1] || languages.en
 
   return (
-    <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200 sticky top-0 z-50 dark:bg-[#121212]/95 dark:border-white/15">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -218,6 +219,9 @@ export default function Header() {
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Theme toggle */}
+            <ThemeToggle />
 
             {/* Mobile menu button */}
             <button

@@ -361,6 +361,86 @@
   }
 }
 
+/* Class-based dark mode (toggled via .dark on <html>) */
+.dark .glass-card {
+  background: rgba(18, 18, 18, 0.95);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.dark .pro-card {
+  background: #121212;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #eeeeee;
+}
+
+.dark .pro-card:hover {
+  border-color: var(--primary-400);
+}
+
+.dark .metric-card {
+  background: linear-gradient(135deg, #1f1f1f 0%, #121212 100%);
+}
+
+.dark .chart-container {
+  background: #121212;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.dark .pro-input,
+.dark .pro-select {
+  background: #121212;
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #eeeeee;
+}
+
+.dark .progress-bar {
+  background: #28282c;
+}
+
+.dark .badge-primary {
+  background: #33200f;
+  color: #fdba74;
+}
+
+.dark .badge-success {
+  background: #12301d;
+  color: #86efac;
+}
+
+.dark .badge-warning {
+  background: #33260f;
+  color: #fcd34d;
+}
+
+.dark .skeleton {
+  background: linear-gradient(90deg, #28282c 25%, #333333 50%, #28282c 75%);
+}
+
+.dark .nav-professional {
+  background: rgba(18, 18, 18, 0.95);
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+.dark .status-positive {
+  background: #12301d;
+  color: #86efac;
+}
+
+.dark .status-negative {
+  background: #3a1519;
+  color: #fca5a5;
+}
+
+.dark .status-neutral {
+  background: #28282c;
+  color: #a3a3a3;
+}
+
+.dark .border-gradient {
+  background: linear-gradient(#121212, #121212) padding-box,
+              var(--gradient-primary) border-box;
+}
+
 /* Animation Classes */
 .fade-in {
   animation: fadeIn 0.6s ease-out;

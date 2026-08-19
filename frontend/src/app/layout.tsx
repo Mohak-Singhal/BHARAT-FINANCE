@@ -39,8 +39,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} min-h-screen bg-gray-50`}>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('bharat-finance-theme');var d=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d)}catch(e){}})()`,
+          }}
+        />
+      </head>
+      <body className={`${inter.className} min-h-screen bg-gray-50 dark:bg-[#070707] dark:text-[#eeeeee]`}>
         <I18nProvider>
           <LanguageProvider>
             <div className="flex flex-col min-h-screen">

@@ -113,6 +113,9 @@
 }
 
 /* Dark mode support */
+@import '../styles/dark-theme.css';
+
+/* Fallback for older browsers */
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
