@@ -88,6 +88,86 @@ const DEFAULT_ARTICLES: ArticleResult[] = [
     publishedDate: new Date(Date.now() - 432000000),
     description: 'Understanding the regulatory landscape for stock markets in India (SEBI).',
   },
+  {
+    id: 'article_6',
+    title: 'Credit Score Explained: How to Improve Your CIBIL Score',
+    url: 'https://www.moneycontrol.com/credit-score/',
+    source: 'Money Control',
+    publishedDate: new Date(Date.now() - 518400000),
+    description: 'Everything you need to know about credit scores and how to build a healthy one.',
+  },
+  {
+    id: 'article_7',
+    title: 'GST and Its Impact on Your Monthly Budget',
+    url: 'https://www.livemint.com/money',
+    source: 'Mint',
+    publishedDate: new Date(Date.now() - 604800000),
+    description: 'How GST affects everyday expenses and smart ways to plan around it.',
+  },
+  {
+    id: 'article_8',
+    title: 'ELSS Funds: The Dual Benefit of Tax Saving and Wealth Creation',
+    url: 'https://economictimes.indiatimes.com/wealth/tax',
+    source: 'Economic Times',
+    publishedDate: new Date(Date.now() - 691200000),
+    description: 'Why ELSS is the only tax-saving instrument that also invests in equities.',
+  },
+  {
+    id: 'article_9',
+    title: 'Sovereign Gold Bonds vs Physical Gold: Which is Better?',
+    url: 'https://www.business-standard.com/markets',
+    source: 'Business Standard',
+    publishedDate: new Date(Date.now() - 777600000),
+    description: 'A practical comparison between gold bonds and physical gold for Indian investors.',
+  },
+  {
+    id: 'article_10',
+    title: 'Health Insurance: How to Choose the Right Policy',
+    url: 'https://www.policybazaar.com/health-insurance/',
+    source: 'PolicyBazaar',
+    publishedDate: new Date(Date.now() - 864000000),
+    description: 'Key factors to consider when buying health insurance for yourself and family.',
+  },
+  {
+    id: 'article_11',
+    title: 'NPS vs PPF: Retirement Planning Showdown',
+    url: 'https://www.financialexpress.com/money/',
+    source: 'Financial Express',
+    publishedDate: new Date(Date.now() - 950400000),
+    description: 'Comparing two popular retirement instruments for long-term wealth building.',
+  },
+  {
+    id: 'article_12',
+    title: 'Digital Payments Safety: UPI, Cards and Fraud Protection',
+    url: 'https://www.moneycontrol.com/news/business/personal-finance/',
+    source: 'Money Control',
+    publishedDate: new Date(Date.now() - 1036800000),
+    description: 'Stay safe from online payment fraud with these essential digital security tips.',
+  },
+  {
+    id: 'article_13',
+    title: 'Index Funds vs Active Mutual Funds: The Real Difference',
+    url: 'https://economictimes.indiatimes.com/wealth/invest',
+    source: 'Economic Times',
+    publishedDate: new Date(Date.now() - 1123200000),
+    description: 'Understanding fees, returns and strategy differences between index and active funds.',
+  },
+  {
+    id: 'article_14',
+    title: 'Building an Emergency Fund: How Much is Enough?',
+    url: 'https://www.livemint.com/money',
+    source: 'Mint',
+    publishedDate: new Date(Date.now() - 1209600000),
+    description: 'The right size for your emergency corpus and where to park it for easy access.',
+  },
+  {
+    id: 'article_15',
+    title: 'Real Estate vs Stock Market: Where Should You Invest?',
+    url: 'https://www.business-standard.com/markets',
+    source: 'Business Standard',
+    publishedDate: new Date(Date.now() - 1296000000),
+    description: 'Weighing liquidity, returns and risk between property and equity investments.',
+  },
 ]
 
 class LearningService {
@@ -110,44 +190,85 @@ class LearningService {
     const cached = this.getFromCache(cacheKey)
     if (cached) return cached as VideoResult[]
 
-    if (!this.isYouTubeConfigured()) {
-      const mock = this.getMockVideos(query, options)
-      this.setCache(cacheKey, mock)
-      return mock
+    const maxResults = options.maxResults || 10
+
+    if (this.isYouTubeConfigured()) {
+      try {
+        const videos = await this.searchWithYouTubeApi(query, options, maxResults)
+        this.setCache(cacheKey, videos)
+        return videos
+      } catch (error) {
+        console.error('YouTube API search error:', error)
+      }
     }
 
     try {
-      const searchParams = new URLSearchParams({
-        part: 'snippet',
-        q: this.enhanceQuery(query),
-        type: 'video',
-        maxResults: (options.maxResults || 10).toString(),
-        order: 'relevance',
-        safeSearch: 'strict',
-        videoEmbeddable: 'true',
-        relevanceLanguage: options.language || 'en',
-        key: this.youtubeApiKey!,
-      })
-
-      const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?${searchParams}`,
-        { headers: { Accept: 'application/json' } }
-      )
-
-      if (!response.ok) {
-        throw new Error(`YouTube API error: ${response.status}`)
-      }
-
-      const data = await response.json()
-      const videos = this.processYouTubeResults(data)
+      const videos = await this.searchKeyless(query, maxResults)
       this.setCache(cacheKey, videos)
       return videos
     } catch (error) {
-      console.error('YouTube search error:', error)
-      const mock = this.getMockVideos(query, options)
-      this.setCache(cacheKey, mock)
-      return mock
+      console.error('Keyless YouTube search error:', error)
     }
+
+    const mock = this.getMockVideos(query, options)
+    this.setCache(cacheKey, mock)
+    return mock
+  }
+
+  private async searchWithYouTubeApi(
+    query: string,
+    options: SearchOptions,
+    maxResults: number
+  ): Promise<VideoResult[]> {
+    const searchParams = new URLSearchParams({
+      part: 'snippet',
+      q: this.enhanceQuery(query),
+      type: 'video',
+      maxResults: maxResults.toString(),
+      order: 'relevance',
+      safeSearch: 'strict',
+      videoEmbeddable: 'true',
+      relevanceLanguage: options.language || 'en',
+      key: this.youtubeApiKey!,
+    })
+
+    const response = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?${searchParams}`,
+      { headers: { Accept: 'application/json' } }
+    )
+
+    if (!response.ok) {
+      throw new Error(`YouTube API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return this.processYouTubeResults(data)
+  }
+
+  private async searchKeyless(query: string, maxResults: number): Promise<VideoResult[]> {
+    const response = await fetch(
+      `/api/youtube-search?q=${encodeURIComponent(this.enhanceQuery(query))}&maxResults=${maxResults}`,
+      { cache: 'no-store' }
+    )
+
+    if (!response.ok) {
+      throw new Error(`Keyless YouTube search failed: ${response.status}`)
+    }
+
+    const data = await response.json()
+    if (!data.videos || data.videos.length === 0) {
+      throw new Error('No videos returned from keyless search')
+    }
+
+    return data.videos.map((video: any) => ({
+      id: video.id,
+      title: video.title,
+      thumbnail: video.thumbnail,
+      channel: video.channel,
+      url: video.url,
+      description: `Learn about ${query} with this educational video.`,
+      publishedAt: video.publishedAt,
+    }))
   }
 
   /**
@@ -159,10 +280,15 @@ class LearningService {
     if (cached) return cached as ArticleResult[]
 
     const maxResults = options.maxResults || 5
-    const articles = DEFAULT_ARTICLES.map(article => ({
+    const start = this.hashString(query.toLowerCase()) % DEFAULT_ARTICLES.length
+    const rotated = [
+      ...DEFAULT_ARTICLES.slice(start),
+      ...DEFAULT_ARTICLES.slice(0, start),
+    ]
+    const articles = rotated.slice(0, maxResults).map(article => ({
       ...article,
       title: query ? `${article.title} - ${query}` : article.title,
-    })).slice(0, maxResults)
+    }))
 
     this.setCache(cacheKey, articles)
     return articles
@@ -273,7 +399,9 @@ class LearningService {
     ]
 
     const maxResults = options.maxResults || 10
-    return realVideos.slice(0, maxResults).map((video, index) => ({
+    const start = this.hashString(query.toLowerCase()) % realVideos.length
+    const rotated = [...realVideos.slice(start), ...realVideos.slice(0, start)]
+    return rotated.slice(0, maxResults).map((video, index) => ({
       ...video,
       title: titles[index % titles.length],
       thumbnail: `https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`,
@@ -281,6 +409,14 @@ class LearningService {
       description: descriptions[index % descriptions.length],
       publishedAt: new Date().toISOString(),
     }))
+  }
+
+  private hashString(value: string): number {
+    let hash = 0
+    for (let i = 0; i < value.length; i++) {
+      hash = (hash * 31 + value.charCodeAt(i)) >>> 0
+    }
+    return hash
   }
 
   private getFromCache(key: string): unknown | null {
