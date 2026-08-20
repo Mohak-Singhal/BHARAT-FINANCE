@@ -56,7 +56,7 @@ const PolicyImpactSimulator: React.FC = () => {
 
       switch (activeTab) {
         case 'tax':
-          endpoint = 'http://localhost:8001/policy-simulation/simulate/tax-impact';
+          endpoint = '/api/policy-simulation/simulate/tax-impact';
           payload = {
             type: formData.type,
             change_percentage: formData.change_percentage,
@@ -64,7 +64,7 @@ const PolicyImpactSimulator: React.FC = () => {
           };
           break;
         case 'subsidy':
-          endpoint = 'http://localhost:8001/policy-simulation/simulate/subsidy-impact';
+          endpoint = '/api/policy-simulation/simulate/subsidy-impact';
           payload = {
             type: formData.type,
             amount_change: formData.amount_change,
@@ -72,7 +72,7 @@ const PolicyImpactSimulator: React.FC = () => {
           };
           break;
         case 'import_duty':
-          endpoint = 'http://localhost:8001/policy-simulation/simulate/import-duty-impact';
+          endpoint = '/api/policy-simulation/simulate/import-duty-impact';
           payload = {
             category: formData.category,
             duty_change_percentage: formData.duty_change_percentage,

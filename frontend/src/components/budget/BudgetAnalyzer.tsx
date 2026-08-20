@@ -90,7 +90,7 @@ const BudgetAnalyzer: React.FC = () => {
         return acc;
       }, {} as Record<string, number>);
 
-      const response = await fetch('http://localhost:8001/budget/analyze', {
+      const response = await fetch('/api/budget/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

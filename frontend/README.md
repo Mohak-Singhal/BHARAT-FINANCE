@@ -74,7 +74,7 @@ src/
 ### Prerequisites
 - Node.js 18+ 
 - npm or yarn
-- Backend API running on port 8000
+- (Optional) API keys for AI coach, news and market data - the app works with realistic fallbacks without them
 
 ### Installation
 
@@ -95,11 +95,25 @@ npm run dev
 
 ### Environment Variables
 
+The app is fully serverless - all API logic lives in Next.js API routes under `src/app/api`, so no separate backend is needed.
+
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_APP_NAME=Bharat Finance Platform
-NEXT_PUBLIC_APP_VERSION=1.0.0
+# Copy the template (never commit .env.local)
+cp .env.example .env.local
+
+# AI Coach (recommended: Groq; Gemini used as fallback for /api/ai-coach)
+GROQ_API_KEY=your_groq_api_key_here
+GOOGLE_API_KEY=your_google_api_key_here
+
+# Learning content / news / market data
+NEXT_PUBLIC_YOUTUBE_API_KEY=your_youtube_api_key_here
+NEWS_API_KEY=your_news_api_key_here
+NEXT_PUBLIC_NEWS_API_KEY=your_news_api_key_here
+ALPHA_VANTAGE_API_KEY=your_alphavantage_key_here
+NEXT_PUBLIC_ALPHA_VANTAGE_API_KEY=your_alphavantage_key_here
 ```
+
+> **Vercel deployment**: `.env.local` is gitignored, so add every variable above in the Vercel dashboard (Settings → Environment Variables). All endpoints still work without keys - they return realistic curated data with a `source: "fallback"` marker.
 
 ## 📱 Pages Overview
 

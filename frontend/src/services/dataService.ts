@@ -63,17 +63,17 @@ class DataService {
   // Get currency exchange rates (USD to INR)
   async getCurrencyRates(): Promise<CurrencyRate[]> {
     try {
-      const response = await fetch(`${this.EXCHANGE_RATE_API}/USD`)
+      const response = await fetch('/api/market/currency?from=USD&to=INR')
       const data = await response.json()
-      
-      return [
-        {
-          from: 'USD',
-          to: 'INR',
-          rate: data.rates.INR,
-          lastUpdated: data.date
-        }
-      ]
+      if (!data.rates || data.rates.length === 0) {
+        throw new Error('No rates returned')
+      }
+      return data.rates.map((rate: any) => ({
+        from: rate.from,
+        to: rate.to,
+        rate: rate.rate,
+        lastUpdated: rate.lastUpdated
+      }))
     } catch (error) {
       console.error('Error fetching currency rates:', error)
       // Fallback data
@@ -91,32 +91,18 @@ class DataService {
   // Get financial news (using free news sources)
   async getFinancialNews(): Promise<NewsItem[]> {
     try {
-      // Using RSS feeds or free news APIs
-      const mockNews: NewsItem[] = [
-        {
-          title: 'RBI Monetary Policy: Key Rate Decisions Expected',
-          description: 'Reserve Bank of India to announce policy decisions affecting interest rates and inflation targets.',
-          url: '#',
-          publishedAt: new Date().toISOString(),
-          source: 'Economic Times'
-        },
-        {
-          title: 'Mutual Fund SIP Inflows Hit Record High',
-          description: 'Systematic Investment Plans see unprecedented growth as retail investors increase participation.',
-          url: '#',
-          publishedAt: new Date().toISOString(),
-          source: 'Business Standard'
-        },
-        {
-          title: 'New Tax Regime vs Old: Which is Better?',
-          description: 'Comprehensive analysis of tax implications under both regimes for different income groups.',
-          url: '#',
-          publishedAt: new Date().toISOString(),
-          source: 'Mint'
-        }
-      ]
-      
-      return mockNews
+      const response = await fetch('/api/news?mode=top&pageSize=10')
+      const data = await response.json()
+      if (!data.articles || data.articles.length === 0) {
+        throw new Error('No news returned')
+      }
+      return data.articles.map((article: any) => ({
+        title: article.title,
+        description: article.description,
+        url: article.url,
+        publishedAt: article.publishedAt,
+        source: article.source
+      }))
     } catch (error) {
       console.error('Error fetching news:', error)
       return []

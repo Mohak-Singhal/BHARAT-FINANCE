@@ -46,7 +46,7 @@ const ModernAICoach: React.FC = () => {
   // Handle message sending to backend
   const handleSendMessage = async (message: string): Promise<string> => {
     try {
-      const response = await fetch('http://localhost:8001/ai/finance-coach/chat', {
+      const response = await fetch('/api/ai/finance-coach/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

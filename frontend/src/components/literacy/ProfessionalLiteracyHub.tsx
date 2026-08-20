@@ -62,7 +62,7 @@ const ProfessionalLiteracyHub: React.FC = () => {
 
   const fetchTopics = async () => {
     try {
-      const response = await fetch('http://localhost:8001/literacy/topics');
+      const response = await fetch('/api/literacy/topics');
       const data = await response.json();
       setTopics(data.topics);
     } catch (error) {
@@ -89,7 +89,7 @@ const ProfessionalLiteracyHub: React.FC = () => {
 
   const fetchLanguages = async () => {
     try {
-      const response = await fetch('http://localhost:8001/literacy/languages');
+      const response = await fetch('/api/literacy/languages');
       const data = await response.json();
       setLanguages(data.languages);
     } catch (error) {
@@ -114,7 +114,7 @@ const ProfessionalLiteracyHub: React.FC = () => {
   const fetchComprehensiveGuide = async (topic: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8001/literacy/comprehensive-guide/${topic}?language=${selectedLanguage}`);
+      const response = await fetch(`/api/literacy/comprehensive-guide/${topic}?language=${selectedLanguage}`);
       const data = await response.json();
       setComprehensiveGuide(data);
     } catch (error) {

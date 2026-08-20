@@ -106,7 +106,7 @@ const EnhancedInvestmentCalculator: React.FC = () => {
 
   const fetchTopFunds = async () => {
     try {
-      const response = await fetch('http://localhost:8001/simulate/mutual-funds/top-performers/equity');
+      const response = await fetch('/api/simulate/mutual-funds/top-performers/equity');
       const data = await response.json();
       setTopFunds(data.top_performers || []);
     } catch (error) {

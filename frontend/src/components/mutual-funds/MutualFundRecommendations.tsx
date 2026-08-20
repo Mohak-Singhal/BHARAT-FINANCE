@@ -55,7 +55,7 @@ const MutualFundRecommendations: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:8001/simulate/mutual-funds/categories');
+      const response = await fetch('/api/simulate/mutual-funds/categories');
       const data = await response.json();
       setCategories(data.categories);
     } catch (error) {
@@ -66,7 +66,7 @@ const MutualFundRecommendations: React.FC = () => {
   const fetchRecommendations = async (category: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8001/simulate/mutual-funds/top-performers/${category}`);
+      const response = await fetch(`/api/simulate/mutual-funds/top-performers/${category}`);
       const data = await response.json();
       setRecommendations(data.top_performers || []);
     } catch (error) {
