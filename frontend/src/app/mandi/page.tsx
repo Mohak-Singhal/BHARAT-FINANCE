@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Wheat, TrendingUp, MapPin, Calculator } from 'lucide-react'
 import MandiPriceChecker from '@/components/mandi/MandiPriceChecker'
@@ -10,6 +11,7 @@ import MSPInformation from '@/components/mandi/MSPInformation'
 type TabType = 'prices' | 'markets' | 'msp'
 
 export default function MandiPage() {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<TabType>('prices')
 
   const tabs = [
@@ -141,7 +143,7 @@ export default function MandiPage() {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                  💰 MSP (Minimum Support Price)
+                  💰 {t('mandi.mspTitle')}
                 </h3>
                 <p className="text-gray-600 mb-4">
                   MSP is the minimum price guaranteed by the government for certain crops. 

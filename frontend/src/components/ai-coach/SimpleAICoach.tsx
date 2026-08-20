@@ -419,7 +419,7 @@ const SimpleAICoach: React.FC = () => {
                   <Bot className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold">AI Finance Coach</h3>
+                  <h3 className="font-bold">{t('aiCoach.title')}</h3>
                   <div className="flex items-center space-x-2 text-sm text-white/80">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                     <span>

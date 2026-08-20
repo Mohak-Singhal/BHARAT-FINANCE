@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Calculator, 
   TrendingUp, 
@@ -34,6 +35,7 @@ interface SimulationRequest {
 }
 
 const PolicyImpactSimulator: React.FC = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'tax' | 'subsidy' | 'import_duty'>('tax');
   const [simulationResult, setSimulationResult] = useState<PolicySimulation | null>(null);
   const [loading, setLoading] = useState(false);
@@ -159,7 +161,7 @@ const PolicyImpactSimulator: React.FC = () => {
       
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Subsidy Amount Change (₹)
+          {t('policy.subsidyAmount')} Change (₹)
         </label>
         <input
           type="number"
@@ -195,7 +197,7 @@ const PolicyImpactSimulator: React.FC = () => {
           onChange={(e) => setFormData({ ...formData, category: e.target.value })}
           className="pro-select"
         >
-          <option value="electronics">Electronics</option>
+          <option value="electronics">{t('policy.electronics')}</option>
           <option value="automobiles">Automobiles</option>
           <option value="textiles">Textiles</option>
           <option value="machinery">Machinery</option>
@@ -243,7 +245,7 @@ const PolicyImpactSimulator: React.FC = () => {
               <BarChart3 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">Simulation Results</h3>
+              <h3 className="text-xl font-bold text-gray-900">{t('policySimulator.results')}</h3>
               <p className="text-gray-600">Impact analysis for your policy scenario</p>
             </div>
           </div>
@@ -441,10 +443,10 @@ const PolicyImpactSimulator: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Policy <span className="text-gradient">Impact Simulator</span>
+            <span className="text-gradient">{t('policySimulator.title')}</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Understand how government policy changes affect your finances in real-time
+            {t('policySimulator.subtitle')}
           </p>
         </div>
 
@@ -458,7 +460,7 @@ const PolicyImpactSimulator: React.FC = () => {
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Tax Policies
+            {t('policySimulator.taxImpact')}
           </button>
           <button
             onClick={() => setActiveTab('subsidy')}
@@ -468,7 +470,7 @@ const PolicyImpactSimulator: React.FC = () => {
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Subsidies
+            {t('policySimulator.subsidyImpact')}
           </button>
           <button
             onClick={() => setActiveTab('import_duty')}
@@ -478,14 +480,14 @@ const PolicyImpactSimulator: React.FC = () => {
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Import Duties
+            {t('policySimulator.importDutyImpact')}
           </button>
         </div>
 
         {/* Simulation Form */}
         <div className="pro-card mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Simulate {activeTab.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} Impact
+            {t('policySimulator.simulate')}
           </h2>
           
           {activeTab === 'tax' && renderTaxForm()}
@@ -500,12 +502,12 @@ const PolicyImpactSimulator: React.FC = () => {
             {loading ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                <span>Simulating...</span>
+                <span>{t('policySimulator.loading')}</span>
               </>
             ) : (
               <>
                 <Calculator className="w-5 h-5" />
-                <span>Run Simulation</span>
+                <span>{t('policySimulator.simulate')}</span>
               </>
             )}
           </button>

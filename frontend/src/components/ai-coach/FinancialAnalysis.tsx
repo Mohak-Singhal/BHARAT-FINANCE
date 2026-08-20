@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { BarChart3, TrendingUp, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 interface AnalysisFormData {
   monthly_income: number
@@ -36,6 +37,7 @@ interface AnalysisResult {
 }
 
 export default function FinancialAnalysis() {
+  const { t } = useTranslation()
   const [result, setResult] = useState<AnalysisResult | null>(null)
   const [loading, setLoading] = useState(false)
   
@@ -109,7 +111,7 @@ export default function FinancialAnalysis() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Monthly Income */}
             <div>
-              <label className="form-label">Monthly Income (₹)</label>
+              <label className="form-label">{t('dashboard.monthlyIncome')} (₹)</label>
               <input
                 type="number"
                 {...register('monthly_income', { required: 'Income is required', min: 1000 })}
@@ -123,7 +125,7 @@ export default function FinancialAnalysis() {
 
             {/* Monthly Expenses */}
             <div>
-              <label className="form-label">Monthly Expenses (₹)</label>
+              <label className="form-label">{t('policy.monthlyExpenses')} (₹)</label>
               <input
                 type="number"
                 {...register('monthly_expenses', { required: 'Expenses are required', min: 0 })}
@@ -236,13 +238,13 @@ export default function FinancialAnalysis() {
                 <div className="font-medium">₹{(watchedIncome - watchedExpenses).toLocaleString()}</div>
               </div>
               <div>
-                <span className="text-gray-600">Savings Rate:</span>
+                <span className="text-gray-600">{t('dashboard.savingsRate')}:</span>
                 <div className={`font-medium ${savingsRate >= 20 ? 'text-green-600' : savingsRate >= 10 ? 'text-yellow-600' : 'text-red-600'}`}>
                   {savingsRate.toFixed(1)}%
                 </div>
               </div>
               <div>
-                <span className="text-gray-600">Annual Income:</span>
+                <span className="text-gray-600">{t('policy.annualIncome')}:</span>
                 <div className="font-medium">₹{(watchedIncome * 12).toLocaleString()}</div>
               </div>
               <div>
@@ -261,7 +263,7 @@ export default function FinancialAnalysis() {
             {loading ? (
               <>
                 <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Analyzing...
+                {t('budget.analyzing')}
               </>
             ) : (
               <>
@@ -341,11 +343,11 @@ export default function FinancialAnalysis() {
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm mb-2">
                     <div>
-                      <span className="text-gray-600">Current: </span>
+                      <span className="text-gray-600">{t('budget.current')}: </span>
                       <span className="font-medium">₹{rec.current_allocation.toLocaleString()}</span>
                     </div>
                     <div>
-                      <span className="text-gray-600">Recommended: </span>
+                      <span className="text-gray-600">{t('budget.recommended')}: </span>
                       <span className="font-medium">₹{rec.recommended_allocation.toLocaleString()}</span>
                     </div>
                   </div>
@@ -411,7 +413,7 @@ export default function FinancialAnalysis() {
           {/* AI Explanation */}
           {result.ai_explanation && (
             <div className="bg-purple-50 rounded-xl border border-purple-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">AI Analysis</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('policy.aiExplanation')}</h3>
               <div className="prose prose-sm max-w-none text-gray-700">
                 {result.ai_explanation.split('\n').map((paragraph, index) => (
                   <p key={index} className="mb-2">{paragraph}</p>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Globe, ChevronDown } from 'lucide-react'
 
@@ -19,6 +20,7 @@ const languages = [
 ]
 
 export default function LanguageSelector({ selectedLanguage, onLanguageChange }: LanguageSelectorProps) {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
 
   const selectedLang = languages.find(lang => lang.code === selectedLanguage) || languages[0]
@@ -34,7 +36,7 @@ export default function LanguageSelector({ selectedLanguage, onLanguageChange }:
         <div className="flex items-center">
           <Globe className="h-6 w-6 text-blue-600 mr-3" />
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Choose Your Language</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('literacy.chooseLanguage')}</h3>
             <p className="text-sm text-gray-600">Learn finance in your preferred language</p>
           </div>
         </div>
@@ -91,13 +93,13 @@ export default function LanguageSelector({ selectedLanguage, onLanguageChange }:
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="text-center p-3 bg-blue-50 rounded-lg">
           <div className="text-2xl mb-2">📚</div>
-          <div className="text-sm font-medium text-gray-900">50+ Lessons</div>
+          <div className="text-sm font-medium text-gray-900">50+ {t('literacy.lessons')}</div>
           <div className="text-xs text-gray-600">In each language</div>
         </div>
         
         <div className="text-center p-3 bg-green-50 rounded-lg">
           <div className="text-2xl mb-2">🧠</div>
-          <div className="text-sm font-medium text-gray-900">Interactive Quizzes</div>
+          <div className="text-sm font-medium text-gray-900">{t('literacy.quiz')}</div>
           <div className="text-xs text-gray-600">Test your knowledge</div>
         </div>
         

@@ -1,6 +1,7 @@
 'use client'
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts'
+import { useTranslation } from 'react-i18next'
 import { YearlyBreakdown } from '@/types/investment'
 
 interface InvestmentChartProps {
@@ -8,6 +9,7 @@ interface InvestmentChartProps {
 }
 
 export default function InvestmentChart({ data }: InvestmentChartProps) {
+  const { t } = useTranslation()
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -21,7 +23,7 @@ export default function InvestmentChart({ data }: InvestmentChartProps) {
   }
 
   const chartData = data.map(item => ({
-    year: `Year ${item.year}`,
+    year: `${t('common.year')} ${item.year}`,
     'Invested Amount': item.invested_amount,
     'Corpus Value': item.corpus_value,
     'Inflation Adjusted': item.inflation_adjusted_value,
@@ -146,7 +148,7 @@ export default function InvestmentChart({ data }: InvestmentChartProps) {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Year
+                  {t('common.year')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Invested

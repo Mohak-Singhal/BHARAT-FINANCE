@@ -47,6 +47,36 @@ const FINANCIAL_KEYWORDS = [
   'mutual funds explained',
 ]
 
+const LANGUAGE_QUERY_HINTS: Record<string, string> = {
+  en: '',
+  hi: 'hindi',
+  mr: 'marathi',
+  ta: 'tamil',
+  te: 'telugu',
+  bn: 'bengali',
+  gu: 'gujarati',
+  kn: 'kannada',
+  ml: 'malayalam',
+  or: 'odia',
+  pa: 'punjabi',
+  as: 'assamese',
+}
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  en: 'English',
+  hi: 'Hindi',
+  mr: 'Marathi',
+  ta: 'Tamil',
+  te: 'Telugu',
+  bn: 'Bengali',
+  gu: 'Gujarati',
+  kn: 'Kannada',
+  ml: 'Malayalam',
+  or: 'Odia',
+  pa: 'Punjabi',
+  as: 'Assamese',
+}
+
 const DEFAULT_ARTICLES: ArticleResult[] = [
   {
     id: 'article_1',
@@ -203,7 +233,7 @@ class LearningService {
     }
 
     try {
-      const videos = await this.searchKeyless(query, maxResults)
+      const videos = await this.searchKeyless(query, maxResults, options.language || 'en')
       this.setCache(cacheKey, videos)
       return videos
     } catch (error) {
@@ -222,7 +252,7 @@ class LearningService {
   ): Promise<VideoResult[]> {
     const searchParams = new URLSearchParams({
       part: 'snippet',
-      q: this.enhanceQuery(query),
+      q: this.enhanceQuery(query, options.language),
       type: 'video',
       maxResults: maxResults.toString(),
       order: 'relevance',
@@ -245,9 +275,9 @@ class LearningService {
     return this.processYouTubeResults(data)
   }
 
-  private async searchKeyless(query: string, maxResults: number): Promise<VideoResult[]> {
+  private async searchKeyless(query: string, maxResults: number, language: string): Promise<VideoResult[]> {
     const response = await fetch(
-      `/api/youtube-search?q=${encodeURIComponent(this.enhanceQuery(query))}&maxResults=${maxResults}`,
+      `/api/youtube-search?q=${encodeURIComponent(this.enhanceQuery(query, language))}&maxResults=${maxResults}&language=${language}`,
       { cache: 'no-store' }
     )
 
@@ -327,9 +357,11 @@ class LearningService {
       }))
   }
 
-  private enhanceQuery(query: string): string {
+  private enhanceQuery(query: string, language?: string): string {
     const keyword = FINANCIAL_KEYWORDS[Math.floor(Math.random() * FINANCIAL_KEYWORDS.length)]
-    return `${query} ${keyword} tutorial explanation hindi english`
+    const hint = LANGUAGE_QUERY_HINTS[language || 'en'] || ''
+    const langSuffix = hint ? `${hint} explanation` : 'explanation'
+    return `${query} ${keyword} tutorial ${langSuffix}`.trim()
   }
 
   private generateTopicSummary(topic: string, videos: VideoResult[], articles: ArticleResult[]): string {
@@ -365,29 +397,37 @@ class LearningService {
   }
 
   private getMockVideos(query: string, options: SearchOptions): VideoResult[] {
-    const realVideos = [
-      { id: 'v684N5MLajA', channel: 'Upasana Kou | Personal Finance TV' },
-      { id: 'YSux7rtMo9k', channel: 'INDmoney' },
-      { id: '0dN_SjDlAZY', channel: 'Mahendra Dogney' },
-      { id: 'yIiSrszJUy0', channel: 'Macro Café' },
-      { id: '6sq2o1atWLY', channel: 'Zerodha Varsity' },
-      { id: 'BKTN4C0m6MY', channel: 'Ranveer Allahbadia' },
-      { id: '8A3s9WP_7l4', channel: 'Dhruv Rathee' },
-      { id: '1abxL2U0y0U', channel: 'Investing With Upsurge' },
-      { id: '3UF0ymVdYLA', channel: 'Pranjal Kamra' },
-      { id: 'gv20filGA7o', channel: 'Neeraj Joshi' },
-      { id: 'T7JHfLGm_GY', channel: 'warikoo' },
-      { id: 'FAGJ0ST-kXs', channel: 'XY- Axis Education' },
-      { id: 'TmC_mgrDWRI', channel: 'Policybazaar' },
-      { id: 'pado678nYbg', channel: 'Vaani Wealth' },
-    ]
+    const language = options.language || 'en'
+    const pools: Record<string, Array<{ id: string; channel: string }>> = {
+      en: [
+        { id: 'v684N5MLajA', channel: 'Upasana Kou | Personal Finance TV' },
+        { id: 'YSux7rtMo9k', channel: 'INDmoney' },
+        { id: '6sq2o1atWLY', channel: 'Zerodha Varsity' },
+        { id: 'TmC_mgrDWRI', channel: 'Policybazaar' },
+        { id: 'pado678nYbg', channel: 'Vaani Wealth' },
+      ],
+      hi: [
+        { id: '0dN_SjDlAZY', channel: 'Mahendra Dogney' },
+        { id: '8A3s9WP_7l4', channel: 'Dhruv Rathee' },
+        { id: 'BKTN4C0m6MY', channel: 'Ranveer Allahbadia' },
+        { id: '3UF0ymVdYLA', channel: 'Pranjal Kamra' },
+        { id: 'gv20filGA7o', channel: 'Neeraj Joshi' },
+        { id: 'T7JHfLGm_GY', channel: 'warikoo' },
+        { id: 'FAGJ0ST-kXs', channel: 'XY- Axis Education' },
+        { id: '1abxL2U0y0U', channel: 'Investing With Upsurge' },
+      ],
+    }
+
+    const pool = pools[language] || pools.en
+    const langLabel = LANGUAGE_LABELS[language] || 'English'
+    const langSuffix = language === 'en' ? '' : ` (${langLabel})`
 
     const titles = [
-      `Complete Guide to ${query} for Beginners`,
-      `${query} Explained in Simple Terms`,
-      `Advanced ${query} Strategies`,
-      `${query} Case Studies and Examples`,
-      `Common ${query} Mistakes to Avoid`,
+      `Complete Guide to ${query} for Beginners${langSuffix}`,
+      `${query} Explained in Simple Terms${langSuffix}`,
+      `Advanced ${query} Strategies${langSuffix}`,
+      `${query} Case Studies and Examples${langSuffix}`,
+      `Common ${query} Mistakes to Avoid${langSuffix}`,
     ]
 
     const descriptions = [
@@ -399,8 +439,8 @@ class LearningService {
     ]
 
     const maxResults = options.maxResults || 10
-    const start = this.hashString(query.toLowerCase()) % realVideos.length
-    const rotated = [...realVideos.slice(start), ...realVideos.slice(0, start)]
+    const start = this.hashString(query.toLowerCase()) % pool.length
+    const rotated = [...pool.slice(start), ...pool.slice(0, start)]
     return rotated.slice(0, maxResults).map((video, index) => ({
       ...video,
       title: titles[index % titles.length],

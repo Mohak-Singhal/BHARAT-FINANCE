@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Calculator, PieChart, TrendingDown, Loader2, Info } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 interface TaxFormData {
   annual_income: number
@@ -34,6 +35,7 @@ interface TaxResult {
 }
 
 export default function TaxCalculator() {
+  const { t } = useTranslation()
   const [result, setResult] = useState<TaxResult | null>(null)
   const [loading, setLoading] = useState(false)
   
@@ -91,13 +93,13 @@ export default function TaxCalculator() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
           <div className="flex items-center mb-6">
             <Calculator className="h-6 w-6 text-green-600 mr-2" />
-            <h2 className="text-xl font-bold text-gray-900">Tax Calculator</h2>
+            <h2 className="text-xl font-bold text-gray-900">{t('policy.taxCalculator')}</h2>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Annual Income */}
             <div>
-              <label className="form-label">Annual Income (₹)</label>
+              <label className="form-label">{t('policy.annualIncome')} (₹)</label>
               <input
                 type="number"
                 {...register('annual_income', { required: 'Income is required', min: 0 })}
@@ -173,7 +175,7 @@ export default function TaxCalculator() {
               <h4 className="font-medium text-gray-900 mb-2">Quick Preview</h4>
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Gross Income:</span>
+                  <span className="text-gray-600">{t('policy.grossIncome')}:</span>
                   <span className="font-medium">{formatCurrency(watchedIncome)}</span>
                 </div>
                 <div className="flex justify-between">
@@ -181,7 +183,7 @@ export default function TaxCalculator() {
                   <span className="font-medium">{formatCurrency(watchedDeductions)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Taxable Income:</span>
+                  <span className="text-gray-600">{t('policy.taxableIncome')}:</span>
                   <span className="font-medium">{formatCurrency(Math.max(0, watchedIncome - watchedDeductions))}</span>
                 </div>
               </div>
@@ -201,7 +203,7 @@ export default function TaxCalculator() {
               ) : (
                 <>
                   <Calculator className="h-5 w-5 mr-2" />
-                  Calculate Tax
+                  {t('policy.calculate')}
                 </>
               )}
             </button>
@@ -217,7 +219,7 @@ export default function TaxCalculator() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center mb-6">
                 <PieChart className="h-6 w-6 text-blue-600 mr-2" />
-                <h2 className="text-xl font-bold text-gray-900">Tax Calculation Results</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t('policy.taxResults')}</h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -225,7 +227,7 @@ export default function TaxCalculator() {
                   <div className="text-2xl font-bold text-blue-600 mb-1">
                     {formatCurrency(result.gross_income)}
                   </div>
-                  <div className="text-sm text-gray-600">Gross Income</div>
+                  <div className="text-sm text-gray-600">{t('policy.grossIncome')}</div>
                 </div>
                 
                 <div className="bg-green-50 rounded-lg p-4 text-center">
@@ -239,14 +241,14 @@ export default function TaxCalculator() {
                   <div className="text-2xl font-bold text-red-600 mb-1">
                     {formatCurrency(result.total_tax)}
                   </div>
-                  <div className="text-sm text-gray-600">Total Tax</div>
+                  <div className="text-sm text-gray-600">{t('policy.totalTax')}</div>
                 </div>
                 
                 <div className="bg-purple-50 rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-purple-600 mb-1">
                     {formatCurrency(result.net_income)}
                   </div>
-                  <div className="text-sm text-gray-600">Net Income</div>
+                  <div className="text-sm text-gray-600">{t('policy.netIncome')}</div>
                 </div>
               </div>
 
@@ -254,7 +256,7 @@ export default function TaxCalculator() {
               <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg p-4 mb-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-gray-900">Effective Tax Rate</h3>
+                    <h3 className="font-semibold text-gray-900">{t('policy.effectiveTaxRate')}</h3>
                     <p className="text-sm text-gray-600">Percentage of gross income paid as tax</p>
                   </div>
                   <div className="text-3xl font-bold text-blue-600">
@@ -265,13 +267,13 @@ export default function TaxCalculator() {
 
               {/* Tax Breakdown */}
               <div>
-                <h3 className="font-semibold text-gray-900 mb-4">Tax Slab Breakdown</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">{t('policy.taxBreakdown')}</h3>
                 <div className="space-y-3">
                   {result.tax_breakdown.map((slab, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div>
                         <div className="font-medium text-gray-900">{slab.slab}</div>
-                        <div className="text-sm text-gray-600">Rate: {slab.rate}</div>
+                        <div className="text-sm text-gray-600">{t('policy.rate')}: {slab.rate}</div>
                       </div>
                       <div className="text-right">
                         <div className="font-medium text-gray-900">
@@ -292,7 +294,7 @@ export default function TaxCalculator() {
               <div className="bg-green-50 rounded-xl border border-green-200 p-6">
                 <div className="flex items-center mb-4">
                   <TrendingDown className="h-6 w-6 text-green-600 mr-2" />
-                  <h3 className="text-lg font-semibold text-gray-900">Tax Saving Suggestions</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{t('policy.suggestions')}</h3>
                 </div>
                 <ul className="space-y-2">
                   {result.tax_saving_suggestions.map((suggestion, index) => (
@@ -310,7 +312,7 @@ export default function TaxCalculator() {
               <div className="bg-purple-50 rounded-xl border border-purple-200 p-6">
                 <div className="flex items-center mb-4">
                   <Info className="h-6 w-6 text-purple-600 mr-2" />
-                  <h3 className="text-lg font-semibold text-gray-900">AI Analysis</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{t('policy.aiExplanation')}</h3>
                 </div>
                 <div className="prose prose-sm max-w-none text-gray-700">
                   {result.ai_explanation.split('\n').map((paragraph, index) => (

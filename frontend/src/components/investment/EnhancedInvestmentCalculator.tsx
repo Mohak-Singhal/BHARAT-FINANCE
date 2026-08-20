@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import {
   Calculator,
   TrendingUp,
@@ -45,6 +47,7 @@ interface MutualFund {
 }
 
 const EnhancedInvestmentCalculator: React.FC = () => {
+  const { t } = useTranslation();
   const [investmentType, setInvestmentType] = useState('sip');
   const [monthlyAmount, setMonthlyAmount] = useState(5000);
   const [annualReturn, setAnnualReturn] = useState(12);
@@ -139,7 +142,7 @@ const EnhancedInvestmentCalculator: React.FC = () => {
     } else if (amount >= 100000) {
       return `₹${(amount / 100000).toFixed(2)} L`;
     } else {
-      return `₹${amount.toLocaleString()}`;
+      return `₹${amount.toLocaleString('en-IN')}`;
     }
   };
 
@@ -156,10 +159,10 @@ const EnhancedInvestmentCalculator: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Professional <span className="text-gradient">Investment Calculator</span>
+            {t('investment.title')}
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Calculate returns for SIP, PPF, NPS, and more with real mutual fund recommendations
+            {t('investment.subtitle')}
           </p>
         </div>
 
@@ -207,7 +210,7 @@ const EnhancedInvestmentCalculator: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Monthly Investment (₹)
+                    {t('investment.monthlyAmount')} (₹)
                   </label>
                   <input
                     type="number"
@@ -231,7 +234,7 @@ const EnhancedInvestmentCalculator: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Expected Annual Return (%)
+                    {t('investment.expectedReturns')}
                   </label>
                   <input
                     type="number"
@@ -257,7 +260,7 @@ const EnhancedInvestmentCalculator: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Investment Period (Years)
+                    {t('investment.investmentPeriod')}
                   </label>
                   <input
                     type="number"
@@ -308,7 +311,7 @@ const EnhancedInvestmentCalculator: React.FC = () => {
                 ) : (
                   <>
                     <Calculator className="w-5 h-5" />
-                    <span>Calculate Returns</span>
+                    <span>{t('investment.calculate')}</span>
                   </>
                 )}
               </button>
@@ -329,19 +332,19 @@ const EnhancedInvestmentCalculator: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-sm text-gray-600 mb-1">Total Invested</div>
+                    <div className="text-sm text-gray-600 mb-1">{t('investment.totalInvested')}</div>
                     <div className="text-2xl font-bold text-blue-600">
                       {formatCurrency(result.total_invested)}
                     </div>
                   </div>
                   <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-sm text-gray-600 mb-1">Maturity Amount</div>
+                    <div className="text-sm text-gray-600 mb-1">{t('investment.totalValue')}</div>
                     <div className="text-2xl font-bold text-green-600">
                       {formatCurrency(result.maturity_amount)}
                     </div>
                   </div>
                   <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-sm text-gray-600 mb-1">Total Returns</div>
+                    <div className="text-sm text-gray-600 mb-1">{t('investment.estimatedReturns')}</div>
                     <div className="text-2xl font-bold text-purple-600">
                       {formatCurrency(result.total_returns)}
                     </div>
@@ -411,7 +414,7 @@ const EnhancedInvestmentCalculator: React.FC = () => {
           <div className="space-y-6">
             {/* Top Mutual Funds */}
             <div className="pro-card">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Top Performing Funds</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">{t('investment.topEquityFunds')}</h3>
               <div className="space-y-3">
                 {topFunds.slice(0, 3).map((fund, index) => (
                   <div key={index} className="p-3 bg-gray-50 rounded-lg hover:bg-primary-50 transition-colors cursor-pointer">
@@ -442,9 +445,12 @@ const EnhancedInvestmentCalculator: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <button className="w-full mt-4 text-sm text-primary-600 hover:text-primary-700 font-medium">
-                View All Funds →
-              </button>
+              <Link
+                href="/mutual-funds"
+                className="w-full mt-4 text-sm text-primary-600 hover:text-primary-700 font-medium text-center block"
+              >
+                {t('investment.viewAllFunds')} →
+              </Link>
             </div>
 
             {/* Quick Tips */}

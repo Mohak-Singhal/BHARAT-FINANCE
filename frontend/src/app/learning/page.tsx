@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import {
   BookOpen,
   Search,
@@ -15,38 +16,40 @@ import {
   ExternalLink,
   Loader2,
   Sparkles,
+  Languages,
 } from 'lucide-react'
 import { learningService, VideoResult, ArticleResult } from '@/services/learningService'
+import { supportedLanguages, loadLanguage, languages } from '@/lib/i18n'
 
 const learningCategories = [
   {
     icon: TrendingUp,
-    title: 'Investment Basics',
-    description: 'Learn about stocks, mutual funds, and building wealth',
+    titleKey: 'learning.investmentBasics',
+    descriptionKey: 'learning.investmentBasicsDesc',
     topics: ['Stock Market', 'Mutual Funds', 'SIP', 'Portfolio Management'],
     color: 'from-blue-500 to-cyan-500',
     search: 'stock market investing',
   },
   {
     icon: Calculator,
-    title: 'Financial Planning',
-    description: 'Budget management and financial goal setting',
+    titleKey: 'learning.financialPlanning',
+    descriptionKey: 'learning.financialPlanningDesc',
     topics: ['Budgeting', 'Emergency Fund', 'Goal Setting', 'Expense Tracking'],
     color: 'from-green-500 to-emerald-500',
     search: 'budgeting personal finance',
   },
   {
     icon: Shield,
-    title: 'Insurance & Protection',
-    description: 'Understand different types of insurance and protection',
+    titleKey: 'learning.insuranceProtection',
+    descriptionKey: 'learning.insuranceProtectionDesc',
     topics: ['Life Insurance', 'Health Insurance', 'Term Insurance', 'Claims'],
     color: 'from-purple-500 to-violet-500',
     search: 'insurance planning india',
   },
   {
     icon: Target,
-    title: 'Tax Planning',
-    description: 'Save taxes and optimize your financial strategy',
+    titleKey: 'learning.taxPlanning',
+    descriptionKey: 'learning.taxPlanningDesc',
     topics: ['Section 80C', 'Tax Deductions', 'ITR Filing', 'Tax Saving'],
     color: 'from-orange-500 to-red-500',
     search: 'tax saving india',
@@ -65,6 +68,7 @@ const trendingTopics = [
 ]
 
 export default function LearningPage() {
+  const { t, i18n } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [videos, setVideos] = useState<VideoResult[]>([])
@@ -75,22 +79,35 @@ export default function LearningPage() {
   const [selectedVideo, setSelectedVideo] = useState<VideoResult | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
 
-  const performSearch = useCallback(async (query: string) => {
-    if (!query.trim()) return
-    setLoading(true)
-    setHasSearched(true)
-    try {
-      const content = await learningService.getLearningContent(query.trim(), { maxResults: 8 })
-      setVideos(content.videos)
-      setArticles(content.articles)
-      setSummary(content.summary)
-      setRelatedTopics(content.relatedTopics)
-    } catch (error) {
-      console.error('Learning content error:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const currentLanguage = supportedLanguages.includes(i18n.language) ? i18n.language : 'en'
+
+  const handleLanguageChange = async (languageCode: string) => {
+    await loadLanguage(languageCode)
+    i18n.changeLanguage(languageCode)
+  }
+
+  const performSearch = useCallback(
+    async (query: string) => {
+      if (!query.trim()) return
+      setLoading(true)
+      setHasSearched(true)
+      try {
+        const content = await learningService.getLearningContent(query.trim(), {
+          maxResults: 8,
+          language: currentLanguage,
+        })
+        setVideos(content.videos)
+        setArticles(content.articles)
+        setSummary(content.summary)
+        setRelatedTopics(content.relatedTopics)
+      } catch (error) {
+        console.error('Learning content error:', error)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [currentLanguage]
+  )
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -98,7 +115,7 @@ export default function LearningPage() {
   }
 
   const handleCategoryClick = (category: (typeof learningCategories)[number]) => {
-    setActiveCategory(category.title)
+    setActiveCategory(category.titleKey)
     setSearchTerm(category.search)
     performSearch(category.search)
   }
@@ -114,6 +131,13 @@ export default function LearningPage() {
     }
   }, [hasSearched, performSearch])
 
+  useEffect(() => {
+    if (hasSearched) {
+      performSearch(searchTerm || 'personal finance basics')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLanguage])
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-secondary-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -121,15 +145,32 @@ export default function LearningPage() {
         <div className="text-center mb-10">
           <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-100 to-secondary-100 rounded-full px-6 py-3 mb-6">
             <BookOpen className="w-5 h-5 text-primary-600" />
-            <span className="text-sm font-semibold text-primary-700">Financial Education</span>
+            <span className="text-sm font-semibold text-primary-700">{t('learning.badge')}</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-            Learning <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">Center</span>
+            {t('learning.title')}{' '}
+            <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+              {t('learning.learn')}
+            </span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Expand your financial knowledge with curated educational videos and articles
-            powered by the YouTube Data API.
-          </p>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">{t('learning.subtitle')}</p>
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
+            <div className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-md border border-gray-200">
+              <Languages className="w-4 h-4 text-primary-600" />
+              <span className="text-sm font-semibold text-gray-700">{t('learning.videoLanguage')}:</span>
+              <select
+                value={currentLanguage}
+                onChange={e => handleLanguageChange(e.target.value)}
+                className="bg-transparent text-sm font-semibold text-primary-700 focus:outline-none cursor-pointer"
+              >
+                {supportedLanguages.map(code => (
+                  <option key={code} value={code}>
+                    {languages[code as keyof typeof languages].nativeName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -140,7 +181,7 @@ export default function LearningPage() {
               type="text"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Search financial topics (e.g. mutual funds, stock market, budgeting)..."
+              placeholder={t('learning.searchPlaceholder')}
               className="w-full pl-12 pr-28 py-4 bg-white border-2 border-gray-200 rounded-2xl shadow-lg focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all duration-200"
             />
             <button
@@ -149,29 +190,29 @@ export default function LearningPage() {
               className="absolute right-2 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-secondary-600 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-60 flex items-center gap-2"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-              Learn
+              {t('learning.learn')}
             </button>
           </div>
         </form>
 
         {/* Learning Categories */}
         <section className="mb-10">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Browse Categories</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">{t('learning.browseCategories')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {learningCategories.map((category, index) => (
               <motion.button
-                key={category.title}
+                key={category.titleKey}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 onClick={() => handleCategoryClick(category)}
-                className={`text-left bg-white rounded-2xl p-6 shadow-md border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${activeCategory === category.title ? 'ring-2 ring-primary-500' : ''}`}
+                className={`text-left bg-white rounded-2xl p-6 shadow-md border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${activeCategory === category.titleKey ? 'ring-2 ring-primary-500' : ''}`}
               >
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${category.color} flex items-center justify-center text-white mb-4`}>
                   <category.icon className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{category.title}</h3>
-                <p className="text-sm text-gray-500 mb-4">{category.description}</p>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{t(category.titleKey)}</h3>
+                <p className="text-sm text-gray-500 mb-4">{t(category.descriptionKey)}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {category.topics.map(topic => (
                     <span key={topic} className="text-xs text-gray-500 bg-gray-100 rounded-lg px-2 py-1">
@@ -230,11 +271,11 @@ export default function LearningPage() {
                   <div className="lg:col-span-2">
                     <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                       <Video className="w-5 h-5 text-primary-600" />
-                      Video Tutorials ({videos.length})
+                      {t('learning.videoTutorials')} ({videos.length})
                     </h2>
                     {videos.length === 0 ? (
                       <div className="bg-white rounded-2xl p-8 text-center shadow-md border border-gray-100">
-                        <p className="text-gray-500">No videos found. Try a different search.</p>
+                        <p className="text-gray-500">{t('learning.noVideos')}</p>
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -278,7 +319,7 @@ export default function LearningPage() {
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-1 text-xs text-primary-600 font-semibold hover:text-primary-700"
                                 >
-                                  Watch <ExternalLink className="w-3 h-3" />
+                                  {t('learning.watch')} <ExternalLink className="w-3 h-3" />
                                 </a>
                               </div>
                             </div>
@@ -292,7 +333,7 @@ export default function LearningPage() {
                   <div>
                     <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                       <FileText className="w-5 h-5 text-secondary-600" />
-                      Reading List ({articles.length})
+                      {t('learning.readingList')} ({articles.length})
                     </h2>
                     <div className="space-y-4">
                       {articles.map((article, i) => (
@@ -334,7 +375,7 @@ export default function LearningPage() {
         <section className="mt-12 bg-white rounded-2xl p-6 shadow-md border border-gray-100">
           <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary-500" />
-            Trending Topics
+            {t('learning.trendingTopics')}
           </h3>
           <div className="flex flex-wrap gap-2">
             {trendingTopics.map(topic => (

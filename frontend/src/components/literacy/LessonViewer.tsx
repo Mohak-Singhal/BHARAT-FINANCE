@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { BookOpen, ChevronRight, Clock, Star, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -35,6 +36,7 @@ const topics = [
 ]
 
 export default function LessonViewer({ language }: LessonViewerProps) {
+  const { t } = useTranslation()
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null)
   const [lesson, setLesson] = useState<Lesson | null>(null)
   const [loading, setLoading] = useState(false)
@@ -119,7 +121,7 @@ This lesson is designed to be easy to understand and implement in your daily fin
       {/* Topic Selection */}
       <div className="lg:col-span-1">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Choose a Topic</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">{t('literacy.chooseTopic')}</h2>
           <div className="space-y-3">
             {topics.map((topic) => (
               <button
@@ -158,7 +160,7 @@ This lesson is designed to be easy to understand and implement in your daily fin
         {loading ? (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <Loader2 className="h-12 w-12 text-primary-600 mx-auto mb-4 animate-spin" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading Lesson...</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('literacy.loading')}</h3>
             <p className="text-gray-600">Please wait while we prepare your lesson content.</p>
           </div>
         ) : lesson ? (
@@ -175,7 +177,7 @@ This lesson is designed to be easy to understand and implement in your daily fin
                 <h1 className="text-2xl font-bold text-gray-900 capitalize">{lesson.topic}</h1>
               </div>
               <div className="flex items-center space-x-4 text-sm text-gray-600">
-                <span>Language: {lesson.language}</span>
+                <span>{t('common.language')}: {lesson.language}</span>
                 <span>•</span>
                 <div className="flex items-center">
                   <Star className="h-4 w-4 text-yellow-500 mr-1" />
@@ -224,7 +226,7 @@ This lesson is designed to be easy to understand and implement in your daily fin
             {/* Quick Quiz */}
             {lesson.quiz_questions.length > 0 && (
               <div className="bg-purple-50 rounded-xl border border-purple-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">🧠 Quick Quiz</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">🧠 {t('literacy.quiz')}</h3>
                 <div className="space-y-4">
                   {lesson.quiz_questions.map((question, index) => (
                     <div key={index} className="bg-white rounded-lg p-4 border border-purple-200">
@@ -254,7 +256,7 @@ This lesson is designed to be easy to understand and implement in your daily fin
             {/* Videos Section */}
             {lesson.videos && lesson.videos.length > 0 && (
               <div className="bg-red-50 rounded-xl border border-red-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">📺 Related Videos</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">📺 {t('literacy.videos')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {lesson.videos.map((video, index) => (
                     <div key={index} className="bg-white rounded-lg p-4 border border-red-200">
@@ -287,7 +289,7 @@ This lesson is designed to be easy to understand and implement in your daily fin
             {/* Articles Section */}
             {lesson.articles && lesson.articles.length > 0 && (
               <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">📰 Related Articles</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">📰 {t('literacy.articles')}</h3>
                 <div className="space-y-4">
                   {lesson.articles.map((article, index) => (
                     <div key={index} className="bg-white rounded-lg p-4 border border-blue-200">
@@ -324,7 +326,7 @@ This lesson is designed to be easy to understand and implement in your daily fin
             {/* Government Schemes Section */}
             {lesson.government_schemes && lesson.government_schemes.length > 0 && (
               <div className="bg-green-50 rounded-xl border border-green-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">🏛️ Related Government Schemes</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">🏛️ {t('literacy.schemes')}</h3>
                 <div className="space-y-4">
                   {lesson.government_schemes.map((scheme, index) => (
                     <div key={index} className="bg-white rounded-lg p-4 border border-green-200">
@@ -383,7 +385,7 @@ This lesson is designed to be easy to understand and implement in your daily fin
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <button className="flex items-center justify-center space-x-2 p-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200">
                   <BookOpen className="h-4 w-4" />
-                  <span>Take Quiz</span>
+                  <span>{t('literacy.quiz')}</span>
                 </button>
                 <button className="flex items-center justify-center space-x-2 p-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors duration-200">
                   <ChevronRight className="h-4 w-4" />

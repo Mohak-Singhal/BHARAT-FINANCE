@@ -11,17 +11,36 @@ interface ParsedVideo {
   publishedAt?: string
 }
 
+const LANGUAGE_HINTS: Record<string, string> = {
+  en: '',
+  hi: 'hindi',
+  mr: 'marathi',
+  ta: 'tamil',
+  te: 'telugu',
+  bn: 'bengali',
+  gu: 'gujarati',
+  kn: 'kannada',
+  ml: 'malayalam',
+  or: 'odia',
+  pa: 'punjabi',
+  as: 'assamese',
+}
+
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get('q') || ''
   const maxResults = Math.min(parseInt(request.nextUrl.searchParams.get('maxResults') || '10', 10) || 10, 20)
+  const language = (request.nextUrl.searchParams.get('language') || 'en').toLowerCase()
 
   if (!query.trim() || query.length > 200) {
     return NextResponse.json({ error: 'Invalid query' }, { status: 400 })
   }
 
+  const hint = LANGUAGE_HINTS[language] || ''
+  const searchQuery = hint ? `${query} ${hint}` : query
+
   try {
     const response = await fetch(
-      `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`,
+      `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}`,
       {
         headers: {
           'User-Agent':

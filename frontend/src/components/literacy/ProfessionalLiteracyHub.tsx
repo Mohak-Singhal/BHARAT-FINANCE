@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   BookOpen, 
   Play, 
@@ -45,6 +46,7 @@ interface ComprehensiveGuide {
 }
 
 const ProfessionalLiteracyHub: React.FC = () => {
+  const { t } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState('english');
   const [selectedCategory, setSelectedCategory] = useState('Basic Finance');
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -156,7 +158,7 @@ const ProfessionalLiteracyHub: React.FC = () => {
                   {comprehensiveGuide.topic} Guide
                 </h1>
                 <p className="text-gray-600">
-                  Language: {languages.find(l => l.code === comprehensiveGuide.language)?.native || 'English'}
+                  {t('common.language')}: {languages.find(l => l.code === comprehensiveGuide.language)?.native || 'English'}
                 </p>
               </div>
               <div className="badge badge-primary">Comprehensive</div>
@@ -197,7 +199,7 @@ const ProfessionalLiteracyHub: React.FC = () => {
 
             {comprehensiveGuide.lesson.government_schemes.length > 0 && (
               <div className="mb-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Related Government Schemes</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{t('literacy.schemes')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {comprehensiveGuide.lesson.government_schemes.map((scheme, index) => (
                     <div key={index} className="p-4 bg-success-50 rounded-lg">
@@ -220,7 +222,7 @@ const ProfessionalLiteracyHub: React.FC = () => {
       <div className="hero-professional">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Financial <span className="text-gradient">Literacy Hub</span>
+            {t('literacy.title')}
           </h1>
           <p className="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto mb-8">
             Master financial concepts in your preferred language with AI-powered interactive learning
@@ -296,7 +298,7 @@ const ProfessionalLiteracyHub: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Learning Topics</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('literacy.topics')}</h2>
             
             {loading ? (
               <div className="space-y-4">
@@ -415,7 +417,7 @@ const ProfessionalLiteracyHub: React.FC = () => {
 
             {/* Language Support */}
             <div className="pro-card">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Available Languages</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">{t('literacy.languages')}</h3>
               <div className="grid grid-cols-2 gap-2">
                 {languages.slice(0, 6).map((lang) => (
                   <button

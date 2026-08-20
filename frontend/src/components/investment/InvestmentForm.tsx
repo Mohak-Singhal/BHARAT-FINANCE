@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Calculator, Loader2 } from 'lucide-react'
 import { InvestmentData } from '@/types/investment'
@@ -19,6 +20,7 @@ const investmentTypes = [
 ]
 
 export default function InvestmentForm({ onCalculate, loading }: InvestmentFormProps) {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState<InvestmentData>({
     investment_type: 'sip',
     monthly_amount: 5000,
@@ -61,7 +63,7 @@ export default function InvestmentForm({ onCalculate, loading }: InvestmentFormP
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Investment Type */}
       <div>
-        <label className="form-label">Investment Type</label>
+        <label className="form-label">{t('investment.investmentType')}</label>
         <select
           value={formData.investment_type}
           onChange={(e) => handleInvestmentTypeChange(e.target.value)}
@@ -79,7 +81,7 @@ export default function InvestmentForm({ onCalculate, loading }: InvestmentFormP
       {/* Monthly Amount */}
       <div>
         <label className="form-label">
-          Monthly Investment Amount
+          {t('investment.monthlyAmount')}
         </label>
         <div className="relative">
           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
@@ -104,7 +106,7 @@ export default function InvestmentForm({ onCalculate, loading }: InvestmentFormP
       {/* Expected Returns */}
       <div>
         <label className="form-label">
-          Expected Annual Returns (%)
+          {t('investment.expectedReturns')}
         </label>
         <input
           type="number"
@@ -128,7 +130,7 @@ export default function InvestmentForm({ onCalculate, loading }: InvestmentFormP
       {/* Investment Period */}
       <div>
         <label className="form-label">
-          Investment Period (Years)
+          {t('investment.investmentPeriod')}
         </label>
         <input
           type="number"
@@ -185,17 +187,17 @@ export default function InvestmentForm({ onCalculate, loading }: InvestmentFormP
         <h4 className="font-medium text-gray-900 mb-2">Quick Preview</h4>
         <div className="space-y-1 text-sm">
           <div className="flex justify-between">
-            <span className="text-gray-600">Total Investment:</span>
+            <span className="text-gray-600">{t('investment.totalInvested')}:</span>
             <span className="font-medium">
               {formatCurrency(formData.monthly_amount * formData.investment_period_years * 12)}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Investment Period:</span>
+            <span className="text-gray-600">{t('investment.investmentPeriod')}:</span>
             <span className="font-medium">{formData.investment_period_years} years</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Expected Returns:</span>
+            <span className="text-gray-600">{t('investment.estimatedReturns')}:</span>
             <span className="font-medium">{formData.annual_return_rate}% p.a.</span>
           </div>
         </div>
@@ -217,16 +219,14 @@ export default function InvestmentForm({ onCalculate, loading }: InvestmentFormP
         ) : (
           <>
             <Calculator className="h-5 w-5 mr-2" />
-            Calculate Returns
+            {t('investment.calculate')}
           </>
         )}
       </motion.button>
 
       {/* Disclaimer */}
       <div className="text-xs text-gray-500 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-        <strong>Disclaimer:</strong> These calculations are for educational purposes only.
-        Actual returns may vary based on market conditions. Please consult a financial advisor
-        before making investment decisions.
+        {t('investment.disclaimer')}
       </div>
     </form>
   )

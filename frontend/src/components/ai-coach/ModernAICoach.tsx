@@ -178,7 +178,7 @@ const ModernAICoach: React.FC = () => {
             >
               <h3 className="font-bold text-gray-900 mb-4 flex items-center">
                 <Settings className="w-5 h-5 text-primary-600 mr-2" />
-                Language
+                {t('common.language')}
               </h3>
               <div className="space-y-2">
                 {languages.map((lang) => (

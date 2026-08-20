@@ -71,7 +71,7 @@ const ModernDashboard: React.FC = () => {
 
   const portfolioMetrics: DashboardMetric[] = [
     {
-      title: 'Portfolio Value',
+      title: t('dashboard.portfolio'),
       value: '₹12,45,000',
       change: '+8.5%',
       trend: 'up',
@@ -175,7 +175,7 @@ const ModernDashboard: React.FC = () => {
           
           <div className="flex items-center space-x-4">
             <div className="text-right">
-              <div className="text-sm text-gray-500">Last Updated</div>
+              <div className="text-sm text-gray-500">{t('dashboard.lastUpdated')}</div>
               <div className="flex items-center space-x-2 text-gray-700">
                 <Clock className="w-4 h-4" />
                 <span className="text-sm font-medium">
@@ -359,7 +359,7 @@ const ModernDashboard: React.FC = () => {
                 <button className="w-full text-left p-3 bg-white/80 hover:bg-white rounded-xl transition-colors group">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-gray-700 group-hover:text-primary-700">
-                      Analyze Budget
+                      {t('budget.analyze')}
                     </span>
                     <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-primary-500" />
                   </div>
@@ -368,7 +368,7 @@ const ModernDashboard: React.FC = () => {
                 <button className="w-full text-left p-3 bg-white/80 hover:bg-white rounded-xl transition-colors group">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-gray-700 group-hover:text-primary-700">
-                      Tax Calculator
+                      {t('policy.taxCalculator')}
                     </span>
                     <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-primary-500" />
                   </div>

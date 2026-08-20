@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 import { 
   Github, 
   Twitter, 
@@ -19,11 +20,11 @@ import {
 const footerNavigation = {
   platform: [
     { name: 'Investment Simulator', href: '/investment', icon: Calculator },
-    { name: 'AI Finance Coach', href: '/ai-coach', icon: Bot },
-    { name: 'Policy Simulator', href: '/policy', icon: FileText },
+    { name: 'AI Finance Coach', href: '/ai-coach', icon: Bot, tKey: 'aiCoach.title' },
+    { name: 'Policy Simulator', href: '/policy', icon: FileText, tKey: 'policy.title' },
     { name: 'Financial Literacy', href: '/literacy', icon: BookOpen },
     { name: 'Stock Tracker', href: '/stocks', icon: LineChart },
-    { name: 'Financial News', href: '/news', icon: Newspaper },
+    { name: 'Financial News', href: '/news', icon: Newspaper, tKey: 'news.title' },
     { name: 'Mandi Support', href: '/mandi', icon: Wheat },
   ],
   resources: [
@@ -57,6 +58,7 @@ const socialLinks = [
 ]
 
 export default function Footer() {
+  const { t } = useTranslation()
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -108,7 +110,7 @@ export default function Footer() {
                       className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
                       <Icon className="h-4 w-4" />
-                      <span className="text-sm">{item.name}</span>
+                      <span className="text-sm">{item.tKey ? t(item.tKey) : item.name}</span>
                     </Link>
                   </li>
                 )
@@ -119,7 +121,7 @@ export default function Footer() {
           {/* Resources */}
           <div>
             <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
-              Resources
+              {t('footer.resources')}
             </h3>
             <ul className="space-y-3">
               {footerNavigation.resources.map((item) => (
@@ -202,11 +204,11 @@ export default function Footer() {
             <div className="flex items-center space-x-2 text-sm text-gray-400">
               <span>Made with</span>
               <Heart className="h-4 w-4 text-red-500" />
-              <span>for financial inclusion in India</span>
+              <span>{t('footer.madeWith')} for financial inclusion in India</span>
             </div>
             
             <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-gray-400">
-              <span>© 2024 Bharat Finance Platform. All rights reserved.</span>
+              <span>© 2024 Bharat Finance Platform. {t('footer.rights')}</span>
               <div className="flex items-center space-x-4">
                 <span>Powered by</span>
                 <div className="flex items-center space-x-2">

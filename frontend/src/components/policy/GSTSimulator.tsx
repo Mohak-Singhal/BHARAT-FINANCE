@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { TrendingUp, ShoppingCart, Loader2, AlertCircle } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 interface GSTFormData {
   monthly_expenses: number
@@ -47,7 +48,18 @@ const expenseCategories = [
   { key: 'education', label: 'Education', currentRate: 0, icon: '📚' },
 ]
 
+const categoryLabels: { [key: string]: string } = {
+  food: 'policy.food',
+  clothing: 'policy.clothing',
+  electronics: 'policy.electronics',
+  fuel: 'policy.fuel',
+  services: 'policy.services',
+  medicines: 'policy.medicines',
+  education: 'policy.education',
+}
+
 export default function GSTSimulator() {
+  const { t } = useTranslation()
   const [result, setResult] = useState<GSTResult | null>(null)
   const [loading, setLoading] = useState(false)
   
@@ -137,7 +149,7 @@ export default function GSTSimulator() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <TrendingUp className="h-6 w-6 text-orange-600 mr-2" />
-            <h2 className="text-xl font-bold text-gray-900">GST Impact Simulator</h2>
+            <h2 className="text-xl font-bold text-gray-900">{t('policy.gstSimulator')}</h2>
           </div>
           <button
             type="button"
@@ -151,7 +163,7 @@ export default function GSTSimulator() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Monthly Expenses */}
           <div>
-            <label className="form-label">Total Monthly Expenses (₹)</label>
+            <label className="form-label">{t('policy.monthlyExpenses')} (₹)</label>
             <input
               type="number"
               {...register('monthly_expenses', { required: 'Monthly expenses are required', min: 1000 })}
@@ -171,7 +183,7 @@ export default function GSTSimulator() {
                 <div key={category.key} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-center mb-2">
                     <span className="text-xl mr-2">{category.icon}</span>
-                    <label className="font-medium text-gray-900">{category.label}</label>
+                    <label className="font-medium text-gray-900">{t(categoryLabels[category.key])}</label>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-3">
@@ -286,14 +298,14 @@ export default function GSTSimulator() {
                 <div className={`text-2xl font-bold mb-1 ${result.monthly_impact >= 0 ? 'text-red-600' : 'text-green-600'}`}>
                   {result.monthly_impact >= 0 ? '+' : ''}{formatCurrency(result.monthly_impact)}
                 </div>
-                <div className="text-sm text-gray-600">Monthly Impact</div>
+                <div className="text-sm text-gray-600">{t('policy.monthlyImpact')}</div>
               </div>
               
               <div className={`rounded-lg p-4 text-center ${result.annual_impact >= 0 ? 'bg-red-50' : 'bg-green-50'}`}>
                 <div className={`text-2xl font-bold mb-1 ${result.annual_impact >= 0 ? 'text-red-600' : 'text-green-600'}`}>
                   {result.annual_impact >= 0 ? '+' : ''}{formatCurrency(result.annual_impact)}
                 </div>
-                <div className="text-sm text-gray-600">Annual Impact</div>
+                <div className="text-sm text-gray-600">{t('policy.annualImpact')}</div>
               </div>
             </div>
 
@@ -318,7 +330,7 @@ export default function GSTSimulator() {
 
           {/* Category-wise Impact */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Category-wise Impact</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('policy.categoryWiseImpact')}</h3>
             <div className="space-y-3">
               {Object.entries(result.category_wise_impact).map(([category, impact]) => {
                 const categoryInfo = expenseCategories.find(cat => cat.key === category)
@@ -327,7 +339,7 @@ export default function GSTSimulator() {
                     <div className="flex items-center">
                       <span className="text-xl mr-3">{categoryInfo?.icon}</span>
                       <div>
-                        <div className="font-medium text-gray-900">{categoryInfo?.label}</div>
+                        <div className="font-medium text-gray-900">{categoryInfo ? t(categoryLabels[categoryInfo.key]) : category}</div>
                         <div className="text-sm text-gray-600">
                           Monthly expense: {formatCurrency(watchedExpenses[category as keyof typeof watchedExpenses] || 0)}
                         </div>
@@ -345,7 +357,7 @@ export default function GSTSimulator() {
           {/* AI Explanation */}
           {result.ai_explanation && (
             <div className="bg-purple-50 rounded-xl border border-purple-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">AI Analysis</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('policy.aiExplanation')}</h3>
               <div className="prose prose-sm max-w-none text-gray-700">
                 {result.ai_explanation.split('\n').map((paragraph, index) => (
                   <p key={index} className="mb-2">{paragraph}</p>

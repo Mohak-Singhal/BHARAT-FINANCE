@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FileText, Calculator, TrendingDown, TrendingUp, Fuel, Home } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import TaxCalculator from '@/components/policy/TaxCalculator'
 import GSTSimulator from '@/components/policy/GSTSimulator'
 import SubsidyCalculator from '@/components/policy/SubsidyCalculator'
@@ -11,13 +12,14 @@ import PolicyComparison from '@/components/policy/PolicyComparison'
 type TabType = 'tax' | 'gst' | 'subsidy' | 'comparison'
 
 export default function PolicyPage() {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<TabType>('tax')
 
   const tabs = [
-    { id: 'tax', label: 'Tax Calculator', icon: Calculator, description: 'Calculate income tax' },
+    { id: 'tax', label: t('policy.taxCalculator'), icon: Calculator, description: 'Calculate income tax' },
     { id: 'gst', label: 'GST Impact', icon: TrendingUp, description: 'GST rate changes' },
-    { id: 'subsidy', label: 'Subsidy Impact', icon: Fuel, description: 'Fuel & LPG subsidies' },
-    { id: 'comparison', label: 'Policy Comparison', icon: FileText, description: 'Compare policies' },
+    { id: 'subsidy', label: t('policySimulator.subsidyImpact'), icon: Fuel, description: 'Fuel & LPG subsidies' },
+    { id: 'comparison', label: t('policy.comparisonTitle'), icon: FileText, description: 'Compare policies' },
   ]
 
   return (

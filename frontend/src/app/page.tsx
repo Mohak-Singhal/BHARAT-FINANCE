@@ -460,7 +460,7 @@ export default function HomePage() {
               <div className="bg-gradient-to-br from-primary-500 to-secondary-600 rounded-3xl p-8 shadow-2xl">
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-white/80 text-sm">Portfolio Value</span>
+                    <span className="text-white/80 text-sm">{t('dashboard.portfolio')}</span>
                     <TrendingUp className="w-5 h-5 text-green-300" />
                   </div>
                   <div className="text-3xl font-bold text-white mb-2">₹12,45,000</div>

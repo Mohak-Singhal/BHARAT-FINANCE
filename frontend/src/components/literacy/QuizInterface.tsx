@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslation } from 'react-i18next'
 import { Play } from 'lucide-react'
 
 interface QuizInterfaceProps {
@@ -7,11 +8,12 @@ interface QuizInterfaceProps {
 }
 
 export default function QuizInterface({ language }: QuizInterfaceProps) {
+  const { t } = useTranslation()
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex items-center mb-6">
         <Play className="h-6 w-6 text-green-600 mr-2" />
-        <h2 className="text-xl font-bold text-gray-900">Financial Quiz</h2>
+        <h2 className="text-xl font-bold text-gray-900">{t('literacy.quiz')}</h2>
       </div>
       <p className="text-gray-600">Interactive quizzes in {language} coming soon!</p>
     </div>

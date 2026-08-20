@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { TrendingUp, DollarSign, Target, AlertCircle } from 'lucide-react'
 import { InvestmentResult } from '@/types/investment'
 
@@ -9,6 +10,7 @@ interface InvestmentResultsProps {
 }
 
 export default function InvestmentResults({ result }: InvestmentResultsProps) {
+  const { t } = useTranslation()
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -26,21 +28,21 @@ export default function InvestmentResults({ result }: InvestmentResultsProps) {
 
   const stats = [
     {
-      label: 'Total Invested',
+      label: t('investment.totalInvested'),
       value: formatCurrency(result.total_invested),
       icon: DollarSign,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
     },
     {
-      label: 'Final Corpus',
+      label: t('investment.totalValue'),
       value: formatCurrency(result.final_corpus),
       icon: Target,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
     },
     {
-      label: 'Total Returns',
+      label: t('investment.estimatedReturns'),
       value: formatCurrency(result.total_returns),
       icon: TrendingUp,
       color: 'text-purple-600',

@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { TrendingUp, Users, BookOpen, Calculator } from 'lucide-react'
 
 const stats = [
@@ -16,6 +17,7 @@ const stats = [
   {
     id: 2,
     name: 'Active Users',
+    tKey: 'stats.users',
     value: '5,000+',
     icon: Users,
     description: 'Making smarter decisions',
@@ -43,6 +45,7 @@ const stats = [
 ]
 
 export default function StatsSection() {
+  const { t } = useTranslation()
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -89,7 +92,7 @@ export default function StatsSection() {
                   </motion.div>
                   
                   <div className="text-lg font-semibold text-gray-700 mb-1">
-                    {stat.name}
+                    {stat.tKey ? t(stat.tKey) : stat.name}
                   </div>
                   
                   <div className="text-sm text-gray-500">

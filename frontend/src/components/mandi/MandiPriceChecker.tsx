@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Search, TrendingUp, Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
@@ -42,6 +43,7 @@ const popularCrops = [
 ]
 
 export default function MandiPriceChecker() {
+  const { t } = useTranslation()
   const [result, setResult] = useState<PriceResult | null>(null)
   const [loading, setLoading] = useState(false)
   
@@ -95,14 +97,14 @@ export default function MandiPriceChecker() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center mb-6">
           <Search className="h-6 w-6 text-blue-600 mr-2" />
-          <h2 className="text-xl font-bold text-gray-900">Check Mandi Prices</h2>
+          <h2 className="text-xl font-bold text-gray-900">{t('mandi.checkPrices')}</h2>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Crop Selection */}
             <div>
-              <label className="form-label">Crop *</label>
+              <label className="form-label">{t('mandi.crop')} *</label>
               <input
                 type="text"
                 {...register('crop', { required: 'Crop name is required' })}
@@ -116,7 +118,7 @@ export default function MandiPriceChecker() {
 
             {/* State */}
             <div>
-              <label className="form-label">State (Optional)</label>
+              <label className="form-label">{t('mandi.state')}</label>
               <input
                 type="text"
                 {...register('state')}
@@ -127,7 +129,7 @@ export default function MandiPriceChecker() {
 
             {/* District */}
             <div>
-              <label className="form-label">District (Optional)</label>
+              <label className="form-label">{t('mandi.district')}</label>
               <input
                 type="text"
                 {...register('district')}
@@ -139,7 +141,7 @@ export default function MandiPriceChecker() {
 
           {/* Popular Crops */}
           <div>
-            <label className="form-label">Popular Crops</label>
+            <label className="form-label">{t('mandi.popularCrops')}</label>
             <div className="flex flex-wrap gap-2 mt-2">
               {popularCrops.map((crop) => (
                 <button
@@ -164,12 +166,12 @@ export default function MandiPriceChecker() {
             {loading ? (
               <>
                 <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Fetching Prices...
+                {t('mandi.fetching')}
               </>
             ) : (
               <>
                 <Search className="h-5 w-5 mr-2" />
-                Check Prices
+                {t('mandi.check')}
               </>
             )}
           </button>
@@ -189,7 +191,7 @@ export default function MandiPriceChecker() {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
                 <TrendingUp className="h-6 w-6 text-green-600 mr-2" />
-                <h2 className="text-xl font-bold text-gray-900">Price Summary - {result.crop}</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t('mandi.priceSummary')} - {result.crop}</h2>
               </div>
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${getTrendColor(result.price_trend)}`}>
                 {result.price_trend}
@@ -201,7 +203,7 @@ export default function MandiPriceChecker() {
                 <div className="text-2xl font-bold text-blue-600 mb-1">
                   {formatCurrency(result.average_price)}
                 </div>
-                <div className="text-sm text-gray-600">Average Price</div>
+                <div className="text-sm text-gray-600">{t('mandi.averagePrice')}</div>
                 <div className="text-xs text-gray-500">per quintal</div>
               </div>
               
@@ -209,7 +211,7 @@ export default function MandiPriceChecker() {
                 <div className="text-2xl font-bold text-green-600 mb-1">
                   {result.prices.length}
                 </div>
-                <div className="text-sm text-gray-600">Mandis</div>
+                <div className="text-sm text-gray-600">{t('mandi.mandisReporting')}</div>
                 <div className="text-xs text-gray-500">reporting prices</div>
               </div>
               
@@ -217,7 +219,7 @@ export default function MandiPriceChecker() {
                 <div className="text-2xl font-bold text-purple-600 mb-1">
                   {result.price_trend}
                 </div>
-                <div className="text-sm text-gray-600">Price Trend</div>
+                <div className="text-sm text-gray-600">{t('mandi.priceTrend')}</div>
                 <div className="text-xs text-gray-500">current direction</div>
               </div>
             </div>
@@ -225,28 +227,28 @@ export default function MandiPriceChecker() {
 
           {/* Mandi Prices Table */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Mandi-wise Prices</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('mandi.mandiWisePrices')}</h3>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Mandi
+                      {t('mandi.mandi')}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Location
+                      {t('mandi.location')}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Variety
+                      {t('mandi.variety')}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Min Price
+                      {t('mandi.minPrice')}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Max Price
+                      {t('mandi.maxPrice')}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Modal Price
+                      {t('mandi.modalPrice')}
                     </th>
                   </tr>
                 </thead>
@@ -281,7 +283,7 @@ export default function MandiPriceChecker() {
           {/* AI Insights */}
           {result.ai_explanation && (
             <div className="bg-purple-50 rounded-xl border border-purple-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Market Insights</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('mandi.marketInsights')}</h3>
               <div className="prose prose-sm max-w-none text-gray-700">
                 {result.ai_explanation.split('\n').map((paragraph, index) => (
                   <p key={index} className="mb-2">{paragraph}</p>

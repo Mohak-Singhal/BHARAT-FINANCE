@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Newspaper,
@@ -22,6 +23,7 @@ import {
 } from '@/services/newsService'
 
 export default function NewsPage() {
+  const { t } = useTranslation()
   const [followedTopics, setFollowedTopics] = useState<NewsTopic[]>([])
   const [articles, setArticles] = useState<NewsArticle[]>([])
   const [loading, setLoading] = useState(true)
@@ -116,7 +118,7 @@ export default function NewsPage() {
             <span className="text-sm font-semibold text-primary-700">Personalized Updates</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-            Financial <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">News</span>
+            {t('news.title')}
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Follow the topics that matter to you and get all the latest updates
@@ -128,7 +130,7 @@ export default function NewsPage() {
             className="mt-6 inline-flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-secondary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50"
           >
             {refreshing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            <span>Refresh News</span>
+            <span>{t('common.refresh')}</span>
           </button>
         </div>
 
@@ -183,7 +185,7 @@ export default function NewsPage() {
             </h2>
             {followedTopics.length > 0 && (
               <span className="text-xs text-gray-500">
-                Following {followedTopics.length} {followedTopics.length === 1 ? 'topic' : 'topics'}
+                {t('news.following')} {followedTopics.length} {followedTopics.length === 1 ? 'topic' : 'topics'}
               </span>
             )}
           </div>
@@ -241,7 +243,7 @@ export default function NewsPage() {
                       <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{article.title}</h3>
                       <p className="text-sm text-gray-500 line-clamp-3 mb-3 flex-1">{article.description}</p>
                       <span className="inline-flex items-center gap-1 text-sm text-secondary-600 font-semibold">
-                        Read more <ExternalLink className="w-3.5 h-3.5" />
+                        {t('news.readMore')} <ExternalLink className="w-3.5 h-3.5" />
                       </span>
                     </div>
                   </motion.a>

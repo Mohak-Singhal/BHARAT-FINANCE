@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import {
   CheckCircle,
@@ -23,6 +24,7 @@ interface SystemCheck {
 }
 
 export default function StatusPage() {
+  const { t } = useTranslation()
   const [checks, setChecks] = useState<SystemCheck[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -171,7 +173,7 @@ export default function StatusPage() {
         >
           <h1 className="text-4xl font-bold mb-4">
             <span className="bg-gradient-to-r from-primary-600 via-secondary-600 to-purple-600 bg-clip-text text-transparent">
-              System Status
+              {t('status.title')}
             </span>
           </h1>
           <p className="text-xl text-gray-600">

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { useVoice } from '@/hooks/useVoice'
 import { TTSConfig } from '@/services/voiceService'
+import { useTranslation } from 'react-i18next'
 
 interface Message {
   id: string
@@ -38,6 +39,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
   language = 'en-IN',
   className = ''
 }) => {
+  const { t } = useTranslation()
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -248,7 +250,7 @@ const VoiceChat: React.FC<VoiceChatProps> = ({
               <Bot className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold">AI Finance Coach</h3>
+              <h3 className="font-bold">{t('aiCoach.title')}</h3>
               <div className="flex items-center space-x-2 text-sm text-white/80">
                 {voiceState.isSupported ? (
                   <>

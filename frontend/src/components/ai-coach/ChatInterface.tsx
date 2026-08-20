@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, Bot, User, Loader2, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 interface Message {
   id: string
@@ -15,6 +16,7 @@ interface Message {
 }
 
 export default function ChatInterface() {
+  const { t } = useTranslation()
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -123,7 +125,7 @@ export default function ChatInterface() {
           <Bot className="h-6 w-6 text-purple-600" />
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900">AI Financial Coach</h3>
+          <h3 className="font-semibold text-gray-900">{t('aiCoach.title')}</h3>
           <p className="text-sm text-gray-500">Always here to help with your finances</p>
         </div>
       </div>

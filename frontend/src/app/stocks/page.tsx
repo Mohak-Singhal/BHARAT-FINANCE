@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   TrendingUp,
@@ -20,6 +21,7 @@ import { marketDataService, StockQuote, MarketIndex, StockSearchResult } from '@
 const WATCHLIST_KEY = 'bharat_finance_stock_watchlist'
 
 export default function StocksPage() {
+  const { t } = useTranslation()
   const [indices, setIndices] = useState<MarketIndex[]>([])
   const [popularStocks, setPopularStocks] = useState<StockQuote[]>([])
   const [watchlist, setWatchlist] = useState<StockQuote[]>([])
@@ -150,7 +152,7 @@ export default function StocksPage() {
             className="mt-6 inline-flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-secondary-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50"
           >
             {refreshing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            <span>Refresh Data</span>
+            <span>{t('common.refresh')}</span>
           </button>
         </div>
 
@@ -158,7 +160,7 @@ export default function StocksPage() {
         <section className="mb-10">
           <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-primary-600" />
-            Market Indices
+            {t('stocks.marketIndices')}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {loading
@@ -198,17 +200,17 @@ export default function StocksPage() {
           <section className="lg:col-span-2">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-primary-600" />
-              Popular Indian Stocks
+              {t('stocks.popularStocks')}
             </h2>
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-gradient-to-r from-primary-50 to-secondary-50 text-gray-600">
-                      <th className="text-left px-5 py-3 font-semibold">Company</th>
-                      <th className="text-right px-5 py-3 font-semibold">Price</th>
-                      <th className="text-right px-5 py-3 font-semibold">Change</th>
-                      <th className="text-right px-5 py-3 font-semibold hidden md:table-cell">Volume</th>
+                      <th className="text-left px-5 py-3 font-semibold">{t('stocks.name')}</th>
+                      <th className="text-right px-5 py-3 font-semibold">{t('stocks.price')}</th>
+                      <th className="text-right px-5 py-3 font-semibold">{t('stocks.change')}</th>
+                      <th className="text-right px-5 py-3 font-semibold hidden md:table-cell">{t('stocks.volume')}</th>
                       <th className="text-center px-5 py-3 font-semibold">Watch</th>
                     </tr>
                   </thead>
@@ -278,7 +280,7 @@ export default function StocksPage() {
                 type="text"
                 value={searchTerm}
                 onChange={e => handleSearch(e.target.value)}
-                placeholder="Search stocks (e.g. RELIANCE, TCS)..."
+                placeholder={t('stocks.searchPlaceholder')}
                 className="w-full pl-10 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all duration-200"
               />
               {searching && <Loader2 className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-500 animate-spin" />}

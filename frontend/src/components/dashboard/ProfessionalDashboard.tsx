@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { 
   TrendingUp, 
   DollarSign, 
@@ -35,6 +36,7 @@ interface BudgetRecommendation {
 }
 
 const ProfessionalDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const [metrics, setMetrics] = useState<DashboardMetric[]>([]);
   const [budgetRecommendations, setBudgetRecommendations] = useState<BudgetRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -218,11 +220,11 @@ const ProfessionalDashboard: React.FC = () => {
                     
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div>
-                        <p className="text-sm text-gray-500">Current</p>
+                        <p className="text-sm text-gray-500">{t('budget.current')}</p>
                         <p className="text-lg font-semibold">₹{rec.current.toLocaleString()}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Recommended</p>
+                        <p className="text-sm text-gray-500">{t('budget.recommended')}</p>
                         <p className="text-lg font-semibold">₹{rec.recommended.toLocaleString()}</p>
                       </div>
                     </div>
@@ -250,7 +252,7 @@ const ProfessionalDashboard: React.FC = () => {
               <div className="space-y-3">
                 <button className="w-full flex items-center space-x-3 p-4 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors">
                   <Calculator className="w-5 h-5 text-primary-600" />
-                  <span className="font-medium text-primary-700">Investment Calculator</span>
+                  <span className="font-medium text-primary-700">{t('investment.title')}</span>
                 </button>
                 <button className="w-full flex items-center space-x-3 p-4 bg-secondary-50 hover:bg-secondary-100 rounded-lg transition-colors">
                   <BookOpen className="w-5 h-5 text-secondary-600" />
@@ -262,7 +264,7 @@ const ProfessionalDashboard: React.FC = () => {
                 </button>
                 <button className="w-full flex items-center space-x-3 p-4 bg-warning-50 hover:bg-warning-100 rounded-lg transition-colors">
                   <Briefcase className="w-5 h-5 text-warning-600" />
-                  <span className="font-medium text-warning-700">Policy Simulator</span>
+                  <span className="font-medium text-warning-700">{t('policy.title')}</span>
                 </button>
               </div>
             </div>
@@ -322,7 +324,7 @@ const ProfessionalDashboard: React.FC = () => {
               <div className="w-16 h-16 bg-gradient-success rounded-full flex items-center justify-center mx-auto mb-4">
                 <PieChart className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Policy Impact Simulator</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{t('policySimulator.title')}</h3>
               <p className="text-gray-600 mb-4">Understand how government policies affect your finances in real-time</p>
               <button className="btn-gradient w-full">Try Simulator</button>
             </div>
@@ -335,7 +337,7 @@ const ProfessionalDashboard: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Multilingual Learning</h3>
               <p className="text-gray-600 mb-4">Learn financial concepts in your preferred language with interactive content</p>
-              <button className="btn-gradient w-full">Start Learning</button>
+              <button className="btn-gradient w-full">{t('literacy.startLearning')}</button>
             </div>
           </div>
         </div>

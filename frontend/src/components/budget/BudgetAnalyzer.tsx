@@ -61,16 +61,16 @@ const BudgetAnalyzer: React.FC = () => {
   const { t } = useTranslation()
   const [monthlyIncome, setMonthlyIncome] = useState<number>(50000);
   const [expenses, setExpenses] = useState<ExpenseCategory[]>([
-    { id: 'housing', name: 'Housing (Rent/EMI)', amount: 20000, icon: <Home className="w-5 h-5" />, color: 'bg-blue-500', type: 'essential' },
-    { id: 'food', name: 'Food & Groceries', amount: 8000, icon: <Utensils className="w-5 h-5" />, color: 'bg-green-500', type: 'essential' },
-    { id: 'utilities', name: 'Utilities', amount: 3000, icon: <Zap className="w-5 h-5" />, color: 'bg-yellow-500', type: 'essential' },
-    { id: 'transportation', name: 'Transportation', amount: 5000, icon: <Car className="w-5 h-5" />, color: 'bg-purple-500', type: 'essential' },
-    { id: 'healthcare', name: 'Healthcare', amount: 2000, icon: <Heart className="w-5 h-5" />, color: 'bg-red-500', type: 'essential' },
-    { id: 'entertainment', name: 'Entertainment', amount: 4000, icon: <Film className="w-5 h-5" />, color: 'bg-pink-500', type: 'discretionary' },
-    { id: 'dining', name: 'Dining Out', amount: 3000, icon: <Utensils className="w-5 h-5" />, color: 'bg-orange-500', type: 'discretionary' },
-    { id: 'shopping', name: 'Shopping', amount: 2500, icon: <ShoppingCart className="w-5 h-5" />, color: 'bg-indigo-500', type: 'discretionary' },
-    { id: 'savings', name: 'Savings', amount: 5000, icon: <Wallet className="w-5 h-5" />, color: 'bg-emerald-500', type: 'financial' },
-    { id: 'investments', name: 'Investments', amount: 3000, icon: <TrendingUp className="w-5 h-5" />, color: 'bg-cyan-500', type: 'financial' },
+    { id: 'housing', name: t('budget.cat.housing'), amount: 20000, icon: <Home className="w-5 h-5" />, color: 'bg-blue-500', type: 'essential' },
+    { id: 'food', name: t('budget.cat.food'), amount: 8000, icon: <Utensils className="w-5 h-5" />, color: 'bg-green-500', type: 'essential' },
+    { id: 'utilities', name: t('budget.cat.utilities'), amount: 3000, icon: <Zap className="w-5 h-5" />, color: 'bg-yellow-500', type: 'essential' },
+    { id: 'transportation', name: t('budget.cat.transportation'), amount: 5000, icon: <Car className="w-5 h-5" />, color: 'bg-purple-500', type: 'essential' },
+    { id: 'healthcare', name: t('budget.cat.healthcare'), amount: 2000, icon: <Heart className="w-5 h-5" />, color: 'bg-red-500', type: 'essential' },
+    { id: 'entertainment', name: t('budget.cat.entertainment'), amount: 4000, icon: <Film className="w-5 h-5" />, color: 'bg-pink-500', type: 'discretionary' },
+    { id: 'dining', name: t('budget.cat.dining'), amount: 3000, icon: <Utensils className="w-5 h-5" />, color: 'bg-orange-500', type: 'discretionary' },
+    { id: 'shopping', name: t('budget.cat.shopping'), amount: 2500, icon: <ShoppingCart className="w-5 h-5" />, color: 'bg-indigo-500', type: 'discretionary' },
+    { id: 'savings', name: t('budget.cat.savings'), amount: 5000, icon: <Wallet className="w-5 h-5" />, color: 'bg-emerald-500', type: 'financial' },
+    { id: 'investments', name: t('budget.cat.investments'), amount: 3000, icon: <TrendingUp className="w-5 h-5" />, color: 'bg-cyan-500', type: 'financial' },
   ]);
   
   const [analysis, setAnalysis] = useState<BudgetAnalysis | null>(null);
@@ -178,7 +178,7 @@ const BudgetAnalyzer: React.FC = () => {
           <div className="inline-flex items-center space-x-3 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 mb-6 shadow-lg">
             <Brain className="w-6 h-6 text-primary-600" />
             <span className="font-semibold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-              {t('hero.aiPowered')}
+              {t('hero.tryBudget')}
             </span>
             <Sparkles className="w-5 h-5 text-secondary-500" />
           </div>
@@ -197,7 +197,7 @@ const BudgetAnalyzer: React.FC = () => {
         {/* Income Input */}
         <div className="pro-card mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Monthly Income</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{t('budget.monthlyIncome')}</h2>
             <div className="badge badge-primary">Required</div>
           </div>
           <div className="max-w-md">
@@ -218,20 +218,20 @@ const BudgetAnalyzer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="metric-card">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">Total Expenses</span>
+              <span className="text-sm text-gray-600">{t('budget.expensesLabel')}</span>
               <DollarSign className="w-4 h-4 text-gray-400" />
             </div>
             <div className="text-2xl font-bold text-gray-900">
               ₹{totalExpenses.toLocaleString()}
             </div>
             <div className="text-sm text-gray-500">
-              {((totalExpenses / monthlyIncome) * 100).toFixed(1)}% of income
+              {((totalExpenses / monthlyIncome) * 100).toFixed(1)}{t('budget.percentageOfIncome')}
             </div>
           </div>
 
           <div className="metric-card">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">Savings Rate</span>
+              <span className="text-sm text-gray-600">{t('budget.savingsRate')}</span>
               <TrendingUp className="w-4 h-4 text-success-500" />
             </div>
             <div className={`text-2xl font-bold ${savingsRate >= 20 ? 'text-success-600' : savingsRate >= 10 ? 'text-warning-600' : 'text-error-600'}`}>
@@ -257,7 +257,7 @@ const BudgetAnalyzer: React.FC = () => {
 
           <div className="metric-card">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">Budget Score</span>
+              <span className="text-sm text-gray-600">{t('budget.overallScore')}</span>
               <Target className="w-4 h-4 text-secondary-500" />
             </div>
             <div className="text-2xl font-bold text-secondary-600">
@@ -379,12 +379,12 @@ const BudgetAnalyzer: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div>
-                        <p className="text-sm text-gray-600">Current</p>
+                        <p className="text-sm text-gray-600">{t('budget.current')}</p>
                         <p className="text-lg font-bold">₹{category.current_amount.toLocaleString()}</p>
                         <p className="text-sm text-gray-500">{category.percentage_of_income.toFixed(1)}%</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">Recommended</p>
+                        <p className="text-sm text-gray-600">{t('budget.recommended')}</p>
                         <p className="text-lg font-bold">₹{category.recommended_amount.toLocaleString()}</p>
                         <p className="text-sm text-gray-500">{category.recommended_percentage}%</p>
                       </div>
@@ -393,7 +393,7 @@ const BudgetAnalyzer: React.FC = () => {
                     <p className="text-sm text-gray-700 mb-4">{category.description}</p>
 
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-gray-900">Recommendations:</h4>
+                      <h4 className="font-semibold text-gray-900">{t('budget.recommendations')}:</h4>
                       <ul className="space-y-1">
                         {category.tips.slice(0, 3).map((tip, tipIndex) => (
                           <li key={tipIndex} className="text-sm text-gray-600 flex items-start">
@@ -429,7 +429,7 @@ const BudgetAnalyzer: React.FC = () => {
                 <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
                   <Shield className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Emergency Fund</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t('budget.emergencyFund')}</h3>
                 <div className="text-3xl font-bold text-primary-600 mb-2">
                   {analysis.emergency_fund_months.toFixed(1)} months
                 </div>
@@ -440,7 +440,7 @@ const BudgetAnalyzer: React.FC = () => {
                 <div className="w-16 h-16 bg-gradient-success rounded-full flex items-center justify-center mx-auto mb-4">
                   <TrendingUp className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Savings Rate</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t('budget.savingsRate')}</h3>
                 <div className="text-3xl font-bold text-success-600 mb-2">
                   {analysis.savings_rate.toFixed(1)}%
                 </div>
@@ -451,7 +451,7 @@ const BudgetAnalyzer: React.FC = () => {
                 <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
                   <CreditCard className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Debt Ratio</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t('budget.debtToIncome')}</h3>
                 <div className="text-3xl font-bold text-secondary-600 mb-2">
                   {analysis.debt_to_income_ratio.toFixed(1)}%
                 </div>
