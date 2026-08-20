@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getGroqCompletion, detectLanguage, ChatMessage } from '@/lib/api/llm'
+import { offlineGuidance } from '@/lib/api/fallback'
 
 interface FinanceCoachRequest {
   message: string
@@ -38,6 +39,11 @@ function getWarnings(message: string): string[] {
   return warnings
 }
 
+// Deterministic offline guidance used whenever the AI service is unavailable.
+function offlineResponse(message: string): string {
+  return offlineGuidance(message)
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body: FinanceCoachRequest = await request.json()
@@ -53,6 +59,7 @@ export async function POST(request: NextRequest) {
 
     let response: string
     let model: string | undefined
+    let offline = false
     try {
       const result = await getGroqCompletion(
         [...history, { role: 'user', content: message }],
@@ -61,20 +68,10 @@ export async function POST(request: NextRequest) {
       response = result.response
       model = result.model
     } catch (error) {
-      // Offline-safe fallback: helpful, deterministic guidance when no AI key is set.
-      const errorText = error instanceof Error ? error.message : ''
-      if (errorText.includes('not configured')) {
-        return NextResponse.json(
-          {
-            error: 'AI unavailable',
-            setup_required: true,
-            instructions:
-              'Add GROQ_API_KEY (or GOOGLE_API_KEY) to your Vercel project environment variables and redeploy.',
-          },
-          { status: 503 }
-        )
-      }
-      return NextResponse.json({ error: 'Failed to process request' }, { status: 500 })
+      // Graceful degradation: deterministic guidance when the AI service is unavailable.
+      console.error('Finance coach AI unavailable:', error)
+      response = offlineResponse(message)
+      offline = true
     }
 
     const suggestions = getSuggestions(message)
@@ -85,9 +82,11 @@ export async function POST(request: NextRequest) {
       suggestions: suggestions.length > 0 ? suggestions.slice(0, 3) : undefined,
       warnings: warnings.length > 0 ? warnings : undefined,
       detected_language: detectLanguage(message),
+      offline,
       model,
     })
   } catch (error) {
+    console.error('Finance coach error:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }

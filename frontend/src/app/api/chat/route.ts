@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getGroqCompletion, detectLanguage, ChatMessage } from '@/lib/api/llm'
+import { offlineGuidance } from '@/lib/api/fallback'
 
 interface ChatRequest {
   message: string
@@ -20,30 +21,27 @@ export async function POST(request: NextRequest) {
       .filter((m) => m.role === 'user' || m.role === 'assistant')
       .slice(-10)
 
-    let result
+    let response: string
+    let model: string | undefined
+    let offline = false
     try {
-      result = await getGroqCompletion([...history, { role: 'user', content: message }], preferred_language)
+      const result = await getGroqCompletion([...history, { role: 'user', content: message }], preferred_language)
+      response = result.response
+      model = result.model
     } catch (error) {
-      const messageText = error instanceof Error ? error.message : 'Unknown error'
-      return NextResponse.json(
-        {
-          error: 'AI unavailable',
-          details: messageText,
-          api_error: true,
-          setup_required: messageText.includes('not configured'),
-          instructions:
-            'Add GROQ_API_KEY to your Vercel project environment variables (Settings > Environment Variables) and redeploy.',
-        },
-        { status: 503 }
-      )
+      console.error('Chat AI unavailable:', error)
+      response = offlineGuidance(message)
+      offline = true
     }
 
     return NextResponse.json({
-      response: result.response,
+      response,
       detected_language: detectLanguage(message),
-      model: result.model,
+      model,
+      offline,
     })
   } catch (error) {
+    console.error('Chat error:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }

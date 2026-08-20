@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { getGroqCompletion, ChatMessage } from '@/lib/api/llm'
+import { offlineGuidance } from '@/lib/api/fallback'
 
 const SYSTEM_INSTRUCTION = `You are a helpful, empathetic, and knowledgeable Finance Coach for rural India.
 Your goal is to help users with financial literacy, government schemes, budgeting, and investment advice in a simple, easy-to-understand manner.
@@ -61,17 +62,12 @@ export async function POST(req: NextRequest) {
       )
       return NextResponse.json({ response: result.response, model: result.model })
     } catch (error) {
-      const messageText = error instanceof Error ? error.message : 'Unknown error'
-      return NextResponse.json(
-        {
-          error: 'AI unavailable',
-          details: messageText,
-          setup_required: messageText.includes('not configured'),
-          instructions:
-            'Add GOOGLE_API_KEY or GROQ_API_KEY to your Vercel project environment variables and redeploy.',
-        },
-        { status: 503 }
-      )
+      // Graceful degradation: deterministic offline guidance when no AI key works.
+      console.error('AI coach unavailable:', error)
+      return NextResponse.json({
+        response: offlineGuidance(message),
+        offline: true,
+      })
     }
   } catch (error) {
     console.error('Error in AI Coach API:', error)
