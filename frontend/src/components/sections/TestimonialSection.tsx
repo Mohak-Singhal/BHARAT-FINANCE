@@ -131,13 +131,14 @@ export default function TestimonialSection() {
             <p className="text-gray-600 mb-6">
               Start your financial journey today and become the next success story.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="btn-primary">
+            <div className="flex justify-center">
+              <motion.button
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn-primary px-8 py-3 text-base font-semibold shadow-lg"
+              >
                 Get Started Free
-              </button>
-              <button className="btn-outline">
-                Watch Demo
-              </button>
+              </motion.button>
             </div>
           </div>
         </motion.div>

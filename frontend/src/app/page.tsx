@@ -29,6 +29,7 @@ import {
 } from 'lucide-react'
 import StatsSection from '@/components/sections/StatsSection'
 import TestimonialSection from '@/components/sections/TestimonialSection'
+import DemoVideoSection from '@/components/sections/DemoVideoSection'
 import ProfessionalDashboard from '@/components/dashboard/ProfessionalDashboard'
 
 const features = [
@@ -488,6 +489,9 @@ export default function HomePage() {
 
       {/* Testimonials */}
       <TestimonialSection />
+
+      {/* Demo Video */}
+      <DemoVideoSection />
 
       {/* CTA Section */}
       <section className="py-32 bg-gradient-to-br from-primary-600 via-secondary-600 to-purple-600 text-white relative overflow-hidden">
